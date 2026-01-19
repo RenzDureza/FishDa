@@ -1,0 +1,46 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Expo / React Native
+.expo/
+.expo-shared/
+*.expo
+android/
+ios/
+*.keystore
+
+# VSCode
+.vscode/
+
+# Neovim
+*.swp
+*.swo
+*.swn
+*.tmp
+*.bak
+
+# Mac / Linux
+*.DS_Store
+*.directory
+
+# Build output
+dist/
+build/
