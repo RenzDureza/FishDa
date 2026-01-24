@@ -1,18 +1,10 @@
-import mysql from "mysql2";
+import mysql from "mysql2/promise";
 
-const db = mysql.createConnection({
+const db = mysql.createPool({
   host: "localhost",
   user: "root",
   password: "",
   database: "fishda"
-});
-
-db.connect(function (err) {
-  if (err) {
-    console.log("Connection failed:", err.message);
-    return;
-  }
-  console.log("Successfully connected to " + db.config.user);
 });
 
 export default db;
