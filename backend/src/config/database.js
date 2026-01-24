@@ -14,3 +14,5 @@ db.connect(function (err) {
   }
   console.log("Successfully connected to " + db.config.user);
 });
+
+export default db;
