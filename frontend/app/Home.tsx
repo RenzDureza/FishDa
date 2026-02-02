@@ -1,7 +1,7 @@
 import { Text, Touchable, TouchableOpacity, View, Image} from "react-native";
 import logo from "../assets/images/Isda-StrokedS.png"
 
-export default function Index() {
+export default function Home() {
   return (
     <View className="flex-1 space-y-4 items-center justify-center bg-[#8CCDEB]">
 
