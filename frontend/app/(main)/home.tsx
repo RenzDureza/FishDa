@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View, Image} from "react-native";
-import logo from "../assets/images/Isda-StrokedS.png"
+import logo from "@/assets/images/Isda-StrokedS.png"
 
 export default function Home() {
   return (

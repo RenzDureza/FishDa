@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import logo from "../assets/images/Isda-iconS.png"
-import gicon from "../assets/images/g-iconL.png";
+import logo from "@/assets/images/Isda-iconS.png"
+import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
 
 export default function SignUp() {
@@ -77,7 +77,7 @@ export default function SignUp() {
 
                     <Text className="text-[#0B1D51] text-center mt-4">
                         Already have an account?
-                        <Link href="/signIn" asChild>
+                        <Link href="/signin" asChild>
                             <Text className="text-cyan-500 underline px-1">
                                 Sign In!
                             </Text>
