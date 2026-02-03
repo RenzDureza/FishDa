@@ -1,44 +1,57 @@
-import { Text, Touchable, TouchableOpacity, View, Image, TextInput} from "react-native";
-import { AntDesign, MaterialIcons, Ionicons } from "@expo/vector-icons";
-import logo from "../assets/images/Isda-StrokedS.png"
+import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
+import { AntDesign, Ionicons } from "@expo/vector-icons";
+import logo from "../assets/images/Isda-iconS.png"
 import gicon from "../assets/images/g-iconL.png";
 import { Link } from "expo-router";
 
-export default function signIn() {
+
+
+export default function SignIn() {
     return (
-        <View className="min-h-screen flex items-center justify-center bg-[#8CCDEB]">
+        <View className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
 
-            <Image source={logo} className="w-32 h-32"/>
-            <View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] space-y-4 py-4">
-                <Text className="text-3xl text-[#0B1D51] font-semibold">Sign In</Text>
-                <Text className="text-[#FFE3A9]">Message Error/Success</Text> {/* Change color */}
+            <Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain"/>
+            <View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
+                <Text className="text-3xl text-[#0B1D51] font-semibold">
+                    Sign In
+                </Text>
 
-                <View className="space-y-1">
+                <Text className="text-[#FFE3A9] mt-4">
+                    Message Error/Success
+                </Text> {/* Placeholder */}
+
+                <View className="mt-1">
                     <Text className="">Email</Text>
                     <TextInput
                     //value="{email}" //remove quotation and comment
                     placeholder="JuanDelaCruz@email.com"
                     keyboardType="email-address"
                     autoCapitalize="none"
-                    className="bg-white w-96 rounded-lg border border-gray-500 px-2 py-1" />
+                    className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
                 </View>
 
-                <View className="space-y-1">
+                <View className="mt-4">
                     <Text className="">Password</Text>
                     <TextInput
                     //value="{password}" //remove quotation and comment
                     placeholder="***************"
                     secureTextEntry
-                    className="bg-white w-96 rounded-lg border border-gray-500 px-2 py-1" />
+                    className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
                 </View>
 
-                <TouchableOpacity className="bg-white hover:bg-gray-200 text-[#0B1D51] text-center font-semibold py-2 px-4 w-40 border border-black rounded shadow">
-                 Sign In
+                <TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4">
+                    <Text className="text-[#0B1D51] text-center font-semibold">
+                        Sign In
+                    </Text>
                 </TouchableOpacity>
 
-                <View className="flex-row space-x-16">
-                    <TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3">
-                        <Image source={gicon} className="w-5 h-5" resizeMode="contain"/>
+                <View className="flex-row mt-4">
+                    <Text>or</Text>
+                </View>
+
+                <View className="flex-row">
+                    <TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3 mr-10">
+                        <Image source={gicon} style={{ width: 46, height: 46 }} resizeMode="contain"/>
                     </TouchableOpacity>
 
                     <TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3">
@@ -46,8 +59,8 @@ export default function signIn() {
                     </TouchableOpacity>
                 </View>
 
-                <Text className="">
-                    Don't have an account?{" "}
+                <Text className="text-[#0B1D51] text-center mt-4">
+                     {"Don't have an account?"}{' '}
                     <Link href="/signUp" asChild>
                         <Text className="text-cyan-500 underline px-1">
                             Sign Up!
