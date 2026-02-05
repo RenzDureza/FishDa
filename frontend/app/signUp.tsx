@@ -3,8 +3,35 @@ import { Ionicons } from "@expo/vector-icons";
 import logo from "../assets/images/Isda-iconS.png"
 import gicon from "../assets/images/g-iconL.png";
 import { Link } from "expo-router";
+import { useState } from "react";
+import { Alert } from "react-native";
 
 export default function SignUp() {
+    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    
+    const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
+
+    const registerUser = async () => {
+	try {
+	    const res = await fetch(registerURL, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ username, email, password }),
+	    });
+
+	    const data = await res.json();
+
+	    if (res.ok && data.status === "success") {
+		Alert.alert("Success", "User Registered");
+	    } else {
+		Alert.alert("Error: " + data.message);
+	    }
+	} catch(err) {
+	    Alert.alert("Error hi", String(err));
+	}
+    }
     return (
         <View className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
 
@@ -21,7 +48,8 @@ export default function SignUp() {
                     <View className="mt-1">
                         <Text className="">Email</Text>
                         <TextInput
-                        //value="{email}" //remove quotation and comment
+                        value={email} //remove quotation and comment
+			onChangeText={setEmail}
                         placeholder="JuanDelaCruz@email.com"
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -31,7 +59,8 @@ export default function SignUp() {
                     <View className="mt-1">
                         <Text className="">Username</Text>
                         <TextInput
-                        //value="{username}" //remove quotation and comment
+                        value={username} //remove quotation and comment
+			onChangeText={setUsername}
                         placeholder="Juan Dela Cruz"
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -41,7 +70,8 @@ export default function SignUp() {
                     <View className="mt-4">
                         <Text className="">Password</Text>
                         <TextInput
-                        //value="{password}" //remove quotation and comment
+                        value={password} //remove quotation and comment
+			onChangeText={setPassword}
                         placeholder="***************"
                         secureTextEntry
                         className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
@@ -55,7 +85,12 @@ export default function SignUp() {
                         className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
                     </View>
 
-                    <TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4">
+                    <TouchableOpacity 
+			className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
+			onPress={() => {
+			    registerUser();
+			}}
+		    >
                         <Text className="text-[#0B1D51] text-center font-semibold">
                             Sign Up
                         </Text>
