@@ -2,12 +2,11 @@ import { Stack } from "expo-router";
 import "./global.css"
 
 export default function RootLayout() {
-  return <Stack>
-    <Stack.Screen
-      name="index"
-      options={{
-	    title: "IsdaOK",
-      }}
-    />
-  </Stack>
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(main)" />
+    </Stack>
+  );
 }

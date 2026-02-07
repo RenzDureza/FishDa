@@ -1,10 +1,11 @@
 import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import logo from "../assets/images/Isda-iconS.png"
-import gicon from "../assets/images/g-iconL.png";
+import logo from "@/assets/images/Isda-iconS.png"
+import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUp() {
     const [username, setUsername] = useState("");
@@ -33,7 +34,8 @@ export default function SignUp() {
 	}
     }
     return (
-        <View className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
+        <SafeAreaProvider>
+        <SafeAreaView className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
 
                 <Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain"/>
                 <View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
@@ -43,7 +45,7 @@ export default function SignUp() {
 
                     <Text className="text-[#FFE3A9] mt-4">
                         Message Error/Success
-                    </Text> {/* Placeholder */}
+                    </Text>
 
                     <View className="mt-1">
                         <Text className="">Email</Text>
@@ -119,6 +121,7 @@ export default function SignUp() {
                         </Link>
                     </Text>
                 </View>
-        </View>
+        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
