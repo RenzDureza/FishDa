@@ -8,7 +8,7 @@ export const register = async ({ username, email, password }) => {
     throw new Error("All fields are required");
   }
 
-  const exist = await db.query("SELECT 1 FROM users WHERE email = ?", email);
+  const [exist] = await db.query("SELECT 1 FROM users WHERE email = ?", [email]);
 
   if (exist.length) {
     throw new Error("Email already exists");
@@ -18,5 +18,8 @@ export const register = async ({ username, email, password }) => {
 
   const [result] = await db.query(sql, [ username, email, hashed_pass ]);
   
-  return result.insertId;
-}
+  return {
+    status: "success",
+    userID: result.insertId
+  };
+};
