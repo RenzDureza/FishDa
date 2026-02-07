@@ -23,3 +23,11 @@ export const register = async ({ username, email, password }) => {
     userID: result.insertId
   };
 };
+
+export const showUsers = async () => {
+  const sql = "SELECT `id`, `username` FROM `users`";
+
+  const [result] = await db.query(sql);
+
+  return result
+}
