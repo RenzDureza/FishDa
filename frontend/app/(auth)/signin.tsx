@@ -3,12 +3,12 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
-
-
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignIn() {
     return (
-        <View className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
+        <SafeAreaProvider>
+        <SafeAreaView className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
 
             <Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain"/>
             <View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
@@ -18,7 +18,7 @@ export default function SignIn() {
 
                 <Text className="text-[#FFE3A9] mt-4">
                     Message Error/Success
-                </Text> {/* Placeholder */}
+                </Text>
 
                 <View className="mt-1">
                     <Text className="">Email</Text>
@@ -61,13 +61,14 @@ export default function SignIn() {
 
                 <Text className="text-[#0B1D51] text-center mt-4">
                      {"Don't have an account?"}{' '}
-                    <Link href="/signup" asChild>
+                    <Link href="/signUp" asChild>
                         <Text className="text-cyan-500 underline px-1">
                             Sign Up!
                         </Text>
                     </Link>
                 </Text>
             </View>
-        </View>
+        </SafeAreaView>
+        </SafeAreaProvider>
     );
 }

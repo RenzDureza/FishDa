@@ -3,7 +3,7 @@ import logo from "@/assets/images/Isda-StrokedS.png"
 
 export default function Home() {
   return (
-    <View className="flex-1 space-y-4 items-center justify-center bg-[#8CCDEB] px-4">
+    <View className="flex-1 space-y-4 items-center justify-center bg-primary px-4">
 
       <View className="space-y-6 items-center">
 
