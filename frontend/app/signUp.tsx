@@ -24,7 +24,7 @@ export default function SignUp() {
 	    const data = await res.json();
 
 	    if (res.ok && data.status === "success") {
-		Alert.alert("Success", "User Registered");
+		Alert.alert("Success", data.message);
 	    } else {
 		Alert.alert("Error: " + data.message);
 	    }
