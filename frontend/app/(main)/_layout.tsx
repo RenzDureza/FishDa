@@ -5,11 +5,9 @@ export default function MainDrawer(){
         <Drawer
         screenOptions={{
             headerShown: true,
+            headerShadowVisible: false,
             headerStyle:{
                 backgroundColor: "#8CCDEB",
-                shadowColor: "transparent",
-                elevation: 0,
-                borderBottomWidth: 0,
             },
             drawerStyle: {
                 width: 400,
@@ -17,8 +15,7 @@ export default function MainDrawer(){
             drawerLabelStyle: {
                 textTransform: "none",
             }
-        }}
-        >
+        }}>
         <Drawer.Screen name="index" options={{title: "Home"}} />
         <Drawer.Screen name="settings" options={{ title: "Settings" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>
         <Drawer.Screen name="about" options={{ title: "About" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>

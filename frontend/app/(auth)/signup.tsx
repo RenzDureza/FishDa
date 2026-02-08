@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { Link } from "expo-router";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -114,11 +114,9 @@ export default function SignUp() {
 
                     <Text className="text-[#0B1D51] text-center mt-4">
                         Already have an account?
-                        <Link href="/signin" asChild>
-                            <Text className="text-cyan-500 underline px-1">
+                            <Text className="text-cyan-500 underline px-1" onPress={() => router.push("./signin")}>
                                 Sign In!
                             </Text>
-                        </Link>
                     </Text>
                 </View>
         </SafeAreaView>
