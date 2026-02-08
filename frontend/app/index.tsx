@@ -6,7 +6,7 @@ export default function Index() {
 	const authState = useContext(AuthContext);
 
 	if (authState.isLoggedIn) {
-		return <Redirect href="/(main)/home" />;
+		return <Redirect href="./(main)/home/index" />;
 	} else {
 		return <Redirect href="/(auth)/signin" />;
 	}
