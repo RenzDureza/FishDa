@@ -2,15 +2,18 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { Link } from "expo-router";
-import { useState } from "react";
+import { Link, router } from "expo-router";
+import { useContext, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import * as LocalAuthentication from 'expo-local-authentication';
+import { AuthContext } from "@/utils/authContext";
 
 export default function SignUp() {
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-
+	
+	const authState = useContext(AuthContext)
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
@@ -32,6 +35,23 @@ export default function SignUp() {
 			Alert.alert("Error hi", String(err));
 		}
 	}
+
+	const biometricsAuth = async () => {
+			try {
+				const biometricsResult = await LocalAuthentication.authenticateAsync({
+					promptMessage: 'Login via Authentication'
+				});
+	
+				if (biometricsResult.success){
+					authState.logIn();
+				} else {
+					Alert.alert("Error: " + biometricsResult.error);
+				}
+			} catch (err) {
+				Alert.alert("Error: ", String(err));
+			}
+		}
+
 	return (
 		<SafeAreaProvider>
 			<SafeAreaView className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
@@ -106,7 +126,7 @@ export default function SignUp() {
 							<Image source={gicon} style={{ width: 46, height: 46 }} resizeMode="contain" />
 						</TouchableOpacity>
 
-						<TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3">
+						<TouchableOpacity onPress={biometricsAuth} className="flex-row items-center justify-center rounded-lg py-3">
 							<Ionicons name="finger-print" size={46} color="black" />
 						</TouchableOpacity>
 					</View>

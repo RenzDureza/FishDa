@@ -1,7 +1,7 @@
 import { Text, TouchableOpacity, View, Image} from "react-native";
 import logo from "@/assets/images/Isda-iconS.png";
 import { router } from "expo-router";
-import { AuthContext } from "../../../utils/authContext";
+import { AuthContext } from "@/utils/authContext";
 import { useContext } from "react";
 
 export default function Home() {
@@ -17,7 +17,7 @@ export default function Home() {
           Welcome
         </Text>
 
-        <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => router.push('/home/capture')}>
+        <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => router.push('/scan/capture')}>
           <Text className="text-center font-semibold text-[#0B1D51] ">Scan a Fish!</Text>
         </TouchableOpacity>
 

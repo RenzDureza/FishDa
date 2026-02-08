@@ -6,6 +6,7 @@ import { Link } from "expo-router";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
@@ -31,7 +32,23 @@ export default function SignIn() {
 				Alert.alert("Error: " + data.message);
 			}
 		} catch (err) {
-			Alert.alert("Error hi", String(err));
+			Alert.alert("Error:", String(err));
+		}
+	}
+
+	const biometricsAuth = async () => {
+		try {
+			const biometricsResult = await LocalAuthentication.authenticateAsync({
+				promptMessage: 'Login via Authentication'
+			});
+
+			if (biometricsResult.success){
+				authState.logIn();
+			} else {
+				Alert.alert("Error: " + biometricsResult.error);
+			}
+		} catch (err) {
+			Alert.alert("Error: ", String(err));
 		}
 	}
 
@@ -87,7 +104,7 @@ export default function SignIn() {
 							<Image source={gicon} style={{ width: 46, height: 46 }} resizeMode="contain" />
 						</TouchableOpacity>
 
-						<TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3">
+						<TouchableOpacity onPress={biometricsAuth} className="flex-row items-center justify-center rounded-lg py-3">
 							<Ionicons name="finger-print" size={46} color="black" />
 						</TouchableOpacity>
 					</View>
