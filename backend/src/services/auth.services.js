@@ -20,7 +20,36 @@ export const register = async ({ username, email, password }) => {
 
 	return {
 		status: "success",
+		message: "User Registered Successfully",
 		userID: result.insertId
+	};
+};
+
+export const login = async ({ email, password }) => {
+	const sql = "SELECT `id`, `username`, `password` FROM `users` WHERE `email` = ?";
+
+	if (!email || !password) {
+		throw new Error("All fields are required");
+	}
+
+	const [exist] = await db.query("SELECT 1 FROM users WHERE email = ?", [email]);
+	if (!exist.length) {
+		throw new Error("Email does not exist");
+	}
+
+	const [correctPassword] = await db.query("SELECT `password` FROM `users` WHERE `email` = ?", [email]);
+	const isMatch = await bcrypt.compare(password, correctPassword[0].password);
+	if (!isMatch) {
+		throw new Error("Invalid password");
+	}
+
+	const [result] = await db.query(sql, [email]);
+
+	return {
+		status: "success",
+		message: "User Logged In Successfully",
+		userID: result[0].id,
+		username: result[0].username
 	};
 };
 
