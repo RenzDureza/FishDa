@@ -8,7 +8,7 @@ export default function MainDrawer() {
 				drawerStyle: { width: 400 },
 			}}
 		>
-			<Drawer.Screen name="index" options={{ title: "Home" }} />
+			<Drawer.Screen name="home" options={{ title: "Home" }} />
 			<Drawer.Screen name="settings" options={{ title: "Settings" }} />
 		</Drawer>
 	);
