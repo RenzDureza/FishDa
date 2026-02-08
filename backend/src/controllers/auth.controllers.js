@@ -11,6 +11,7 @@ export const register = async (req, res) => {
 		});
 
 		res.status(201).json({
+			status: "success",
 			message: "User Created",
 			id: userID
 		});
