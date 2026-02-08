@@ -2,32 +2,32 @@ import db from "../config/database.js";
 import bcrypt from "bcryptjs";
 
 export const register = async ({ username, email, password }) => {
-  const sql = "INSERT INTO `users` (`username`, `email`, `password`) VALUES (?, ?, ?)";
+	const sql = "INSERT INTO `users` (`username`, `email`, `password`) VALUES (?, ?, ?)";
 
-  if (!username || !email || !password) {
-    throw new Error("All fields are required");
-  }
+	if (!username || !email || !password) {
+		throw new Error("All fields are required");
+	}
 
-  const [exist] = await db.query("SELECT 1 FROM users WHERE email = ?", [email]);
+	const [exist] = await db.query("SELECT 1 FROM users WHERE email = ?", [email]);
 
-  if (exist.length) {
-    throw new Error("Email already exists");
-  }
+	if (exist.length) {
+		throw new Error("Email already exists");
+	}
 
-  const hashed_pass = await bcrypt.hash(password, 10);
+	const hashed_pass = await bcrypt.hash(password, 10);
 
-  const [result] = await db.query(sql, [ username, email, hashed_pass ]);
-  
-  return {
-    status: "success",
-    userID: result.insertId
-  };
+	const [result] = await db.query(sql, [username, email, hashed_pass]);
+
+	return {
+		status: "success",
+		userID: result.insertId
+	};
 };
 
 export const showUsers = async () => {
-  const sql = "SELECT `id`, `username` FROM `users`";
+	const sql = "SELECT `id`, `username` FROM `users`";
 
-  const [result] = await db.query(sql);
+	const [result] = await db.query(sql);
 
-  return result
+	return result
 }

@@ -1,38 +1,38 @@
 import * as authService from "../services/auth.services.js";
 
 export const register = async (req, res) => {
-  const { username, email, password } = req.body;
+	const { username, email, password } = req.body;
 
-  try {
-    const userID = await authService.register({
-      username, 
-      email,
-      password
-    });
+	try {
+		const userID = await authService.register({
+			username,
+			email,
+			password
+		});
 
-    res.status(201).json({
-      message: "User Created",
-      id: userID
-    });
-  } catch (err) {
-    res.status(500).json({
-      message: err.message
-    });
-  }
+		res.status(201).json({
+			message: "User Created",
+			id: userID
+		});
+	} catch (err) {
+		res.status(500).json({
+			message: err.message
+		});
+	}
 };
 
 export const showUsers = async (req, res) => {
-  try {
-    const userID = await authService.showUsers()
+	try {
+		const userID = await authService.showUsers()
 
-    if (userID.length > 0) {
-    	res.status(200).json(userID);
-    } else {
-	res.status(404).json({ message: "No Item found"});
-    }
-  } catch(err) {
-    res.status(500).json({
-      message: "hi"
-    });
-  }
+		if (userID.length > 0) {
+			res.status(200).json(userID);
+		} else {
+			res.status(404).json({ message: "No Item found" });
+		}
+	} catch (err) {
+		res.status(500).json({
+			message: "hi"
+		});
+	}
 }
