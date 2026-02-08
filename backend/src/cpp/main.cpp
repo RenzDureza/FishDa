@@ -1,7 +1,8 @@
+#include <opencv2/imgproc.hpp>
+#include <vector>
 #define CPPHTTPLIB_MULTIPART_FORM_DATA
 #include "httplib.h"
 
-#include <fstream>
 #include <iostream>
 #include <opencv2/opencv.hpp>
 
@@ -21,7 +22,6 @@ int main() {
 
     const auto &file = req.form.get_file("image");
 
-    // Convert uploaded bytes to OpenCV Mat directly
     vector<uchar> buffer(file.content.begin(), file.content.end());
     Mat img = imdecode(buffer, IMREAD_COLOR);
 
@@ -31,9 +31,8 @@ int main() {
       return;
     }
 
-    // Process image in memory
-    Mat gray;
-    cvtColor(img, gray, COLOR_BGR2GRAY);
+    Mat hsv;
+    cvtColor(img, hsv, COLOR_BGR2HSV);
 
     // imwrite("output.jpg", gray);
 
