@@ -1,17 +1,17 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCameraPermissions, CameraView, CameraType } from "expo-camera";
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import  BackButton  from '@/components/HeaderBar';
+import { router } from 'expo-router';
 
 export default function Capture(){
+    const [imageUri, setImageUri] = useState<string | null>(null);
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
-
-    useEffect(() => {
-        if (!permission?.granted) {
-            requestPermission();
-        }
-    }, [permission, requestPermission]);
+    const cameraRef = useRef<CameraView>(null);
+    const insets = useSafeAreaInsets();
 
     if (!permission){
         return (
@@ -35,19 +35,58 @@ export default function Capture(){
         );
     }
 
+    const captureImage = async () => {
+        console.log("Camera Ref: ", cameraRef);
+        if (!cameraRef.current) return;
+
+        const image = await cameraRef.current.takePictureAsync({
+            quality: 0.6,
+            exif: true,
+        });
+
+        router.push({
+            pathname: "/viewImage",
+            params: { uri: image.uri, metadata: JSON.stringify(image.exif)}
+        });
+    }
+
     function toggleCameraFacing(){
         setFacing(current => (current == 'back' ? 'front' : 'back'))
     }
 
     return(
-        <View className="flex-1 justify-center">
-            <CameraView style={{ height: '60%' , width: '100%'}} facing={facing}/>
-            {/* <CameraView style={{ flex: 1 }} facing={facing}/> */}
-            <View className='absolute bottom-16 flex-row bg-transparent w-full px-16'>
-                <TouchableOpacity className='flex-1 items-center' onPress={toggleCameraFacing}>
-                    <Text className='text-2xl font-bold text-black'>Flip Camera</Text>
+        <View className="flex-1 bg-primary">
+            {/* Camera */}
+            <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing}/>
+
+            {/* Top Bar */}
+            <BackButton onPress={() => router.push('/(main)/home')} />                      
+
+            {/* Bottom Icons */}
+            <SafeAreaView>
+            <View className="bg-primary absolute w-full flex-row items-center justify-between px-12 pt-4"
+            style={{ bottom: insets.bottom}}>
+
+                {/* Image Picker */}
+                <TouchableOpacity className=''>
+                    <Ionicons name="images-outline" size={51} color="black" />                        
                 </TouchableOpacity>
+
+                {/* Capture Image */}
+                <TouchableOpacity
+                    onPress={captureImage}
+                    className='h-20 w-20 rounded-full bg-white border-4 border-black'
+                />
+
+                {/* Flip Camera */}
+                <TouchableOpacity onPress={toggleCameraFacing}>
+                    <Ionicons name="camera-reverse-outline" size={51} color="black" /> 
+                </TouchableOpacity>
+
             </View>
+            </SafeAreaView>
+            
+
         </View>
     );
 }
