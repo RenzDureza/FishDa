@@ -5,14 +5,25 @@ export default function MainDrawer(){
         <Drawer
         screenOptions={{
             headerShown: true,
-            drawerStyle: {width: 400},
+            headerStyle:{
+                backgroundColor: "#8CCDEB",
+                shadowColor: "transparent",
+                elevation: 0,
+                borderBottomWidth: 0,
+            },
+            drawerStyle: {
+                width: 400,
+            },
+            drawerLabelStyle: {
+                textTransform: "none",
+            }
         }}
         >
-        <Drawer.Screen name="Home" options={{ title: "Home" }} />
-        <Drawer.Screen name="Settings" options={{ title: "Settings" }} />
-        <Drawer.Screen name="About" options={{ title: "About" }} />
-        <Drawer.Screen name="Help" options={{ title: "Help" }} />
-        <Drawer.Screen name="Faq" options={{ title: "FAQ" }} />
+        <Drawer.Screen name="index" options={{title: "Home"}} />
+        <Drawer.Screen name="settings" options={{ title: "Settings" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>
+        <Drawer.Screen name="about" options={{ title: "About" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>
+        <Drawer.Screen name="help" options={{ title: "Help" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>
+        <Drawer.Screen name="faq" options={{ title: "FAQ" }} listeners={{drawerItemPress: (e) => {e.preventDefault();}}}/>
 
         </Drawer>
     );
