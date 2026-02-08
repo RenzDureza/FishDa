@@ -1,3 +1,6 @@
+#include <opencv2/core.hpp>
+#include <opencv2/core/cvstd_wrapper.hpp>
+#include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <vector>
 #define CPPHTTPLIB_MULTIPART_FORM_DATA
@@ -31,11 +34,31 @@ int main() {
       return;
     }
 
+    // CSC
     Mat hsv;
     cvtColor(img, hsv, COLOR_BGR2HSV);
 
-    // imwrite("output.jpg", gray);
+    // CLAHE
+    vector<Mat> HSVChannels;
+    split(hsv, HSVChannels);
 
+    Ptr<CLAHE> clahe = createCLAHE();
+    clahe->setClipLimit(4);
+    Mat update_hsv_v;
+    clahe->apply(HSVChannels[2], update_hsv_v);
+
+    update_hsv_v.copyTo(HSVChannels[2]);
+    merge(HSVChannels, hsv);
+
+    Mat output;
+    cvtColor(hsv, output, COLOR_HSV2BGR);
+
+	// For testing
+    // imshow("test", output);
+    // waitKey(0);
+    // destroyAllWindows();
+
+    // imwrite("output.jpg", gray);
     res.set_content("{\"status\":\"ok\"}", "application/json");
   });
 
