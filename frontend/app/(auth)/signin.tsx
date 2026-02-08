@@ -1,11 +1,40 @@
-import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
+import { Text, TouchableOpacity, View, Image, TextInput, Alert} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
+import { useContext, useState } from "react";
+import { AuthContext } from "../../utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignIn() {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
+    const authState = useContext(AuthContext);
+
+    const loginUser = async () => {
+        try{
+            const res = await fetch(loginURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok && data.status === "success") {
+                Alert.alert("Success", data.message);
+                authState.logIn();
+            } else {
+                Alert.alert("Error: " + data.message);
+            }
+        } catch(err) {
+            Alert.alert("Error hi", String(err));
+        }
+    }
+
     return (
         <SafeAreaProvider>
         <SafeAreaView className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
@@ -23,7 +52,8 @@ export default function SignIn() {
                 <View className="mt-1">
                     <Text className="">Email</Text>
                     <TextInput
-                    //value="{email}" //remove quotation and comment
+                    value={email} //remove quotation and comment
+                    onChangeText={setEmail}
                     placeholder="JuanDelaCruz@email.com"
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -33,13 +63,17 @@ export default function SignIn() {
                 <View className="mt-4">
                     <Text className="">Password</Text>
                     <TextInput
-                    //value="{password}" //remove quotation and comment
+                    value={password} //remove quotation and comment
+                    onChangeText={setPassword}
                     placeholder="***************"
                     secureTextEntry
                     className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
                 </View>
 
-                <TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4">
+                <TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
+                    onPress={() => {
+			            loginUser();
+			        }}>
                     <Text className="text-[#0B1D51] text-center font-semibold">
                         Sign In
                     </Text>

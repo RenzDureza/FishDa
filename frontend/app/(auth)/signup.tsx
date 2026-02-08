@@ -1,10 +1,9 @@
-import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
+import { Text, TouchableOpacity, View, Image, TextInput, Alert} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
 import { useState } from "react";
-import { Alert } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUp() {
@@ -15,23 +14,23 @@ export default function SignUp() {
     const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
     const registerUser = async () => {
-	try {
-	    const res = await fetch(registerURL, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ username, email, password }),
-	    });
+	    try {
+	        const res = await fetch(registerURL, {
+	    	    method: "POST",
+	    	    headers: { "Content-Type": "application/json" },
+	    	    body: JSON.stringify({ username, email, password }),
+	        });
 
-	    const data = await res.json();
+	        const data = await res.json();
 
-	    if (res.ok && data.status === "success") {
-		Alert.alert("Success", "User Registered");
-	    } else {
-		Alert.alert("Error: " + data.message);
+	        if (res.ok && data.status === "success") {
+	    	    Alert.alert("Success", data.message);
+	        } else {
+	    	    Alert.alert("Error: " + data.message);
+	        }
+	    } catch(err) {
+	        Alert.alert("Error hi", String(err));
 	    }
-	} catch(err) {
-	    Alert.alert("Error hi", String(err));
-	}
     }
     return (
         <SafeAreaProvider>
@@ -51,7 +50,7 @@ export default function SignUp() {
                         <Text className="">Email</Text>
                         <TextInput
                         value={email} //remove quotation and comment
-			onChangeText={setEmail}
+			            onChangeText={setEmail}
                         placeholder="JuanDelaCruz@email.com"
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -62,7 +61,7 @@ export default function SignUp() {
                         <Text className="">Username</Text>
                         <TextInput
                         value={username} //remove quotation and comment
-			onChangeText={setUsername}
+			            onChangeText={setUsername}
                         placeholder="Juan Dela Cruz"
                         keyboardType="email-address"
                         autoCapitalize="none"
@@ -73,7 +72,7 @@ export default function SignUp() {
                         <Text className="">Password</Text>
                         <TextInput
                         value={password} //remove quotation and comment
-			onChangeText={setPassword}
+			            onChangeText={setPassword}
                         placeholder="***************"
                         secureTextEntry
                         className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
@@ -88,11 +87,10 @@ export default function SignUp() {
                     </View>
 
                     <TouchableOpacity
-			className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
-			onPress={() => {
-			    registerUser();
-			}}
-		    >
+			            className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
+			            onPress={() => {
+			                registerUser();
+			            }}>
                         <Text className="text-[#0B1D51] text-center font-semibold">
                             Sign Up
                         </Text>
