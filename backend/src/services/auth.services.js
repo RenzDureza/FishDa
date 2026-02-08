@@ -20,6 +20,7 @@ export const register = async ({ username, email, password }) => {
 
 	return {
 		status: "success",
+		message: "User Registered Successfully",
 		userID: result.insertId
 	};
 };
