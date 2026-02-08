@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
@@ -111,18 +111,6 @@ export default function SignUp() {
 						</TouchableOpacity>
 					</View>
 
-<<<<<<< HEAD
-                    <Text className="text-[#0B1D51] text-center mt-4">
-                        Already have an account?
-                            <Text className="text-cyan-500 underline px-1" onPress={() => router.push("./signin")}>
-                                Sign In!
-                            </Text>
-                    </Text>
-                </View>
-        </SafeAreaView>
-        </SafeAreaProvider>
-    );
-=======
 					<Text className="text-[#0B1D51] text-center mt-4">
 						Already have an account?
 						<Link href="/signin" asChild>
@@ -135,5 +123,4 @@ export default function SignUp() {
 			</SafeAreaView>
 		</SafeAreaProvider>
 	);
->>>>>>> main
 }

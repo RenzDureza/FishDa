@@ -2,13 +2,9 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
-<<<<<<< HEAD
-import { router } from "expo-router";
-=======
 import { Link } from "expo-router";
 import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/authContext";
->>>>>>> main
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 
@@ -74,19 +70,6 @@ export default function SignIn() {
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
 					</View>
 
-<<<<<<< HEAD
-                    <Text className="text-[#0B1D51] text-center mt-4">
-                        {"Don't have an account?"}{' '}
-                            <Text className="text-cyan-500 underline px-1" onPress={() => router.push("./signup")}>
-                                Sign Up!
-                            </Text>
-                    </Text>
-                </View>
-            </SafeAreaView>
-        </SafeAreaProvider>
-    );
-}
-=======
 					<TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
 						onPress={() => {
 							loginUser();
@@ -123,4 +106,3 @@ export default function SignIn() {
 		</SafeAreaProvider>
 	);
 }
->>>>>>> main
