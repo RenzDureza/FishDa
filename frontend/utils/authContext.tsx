@@ -19,7 +19,7 @@ export function AuthProvider({ children }: PropsWithChildren){
 
     const logIn = () => {
         setLoggedIn(true);
-        router.replace("./(main)/home/index");
+        router.replace("/(main)/home");
     }
     const logOut = () => {
         setLoggedIn(false);
