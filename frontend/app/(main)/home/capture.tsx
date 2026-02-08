@@ -45,7 +45,7 @@ export default function Capture(){
         });
 
         router.push({
-            pathname: "/viewImage",
+            pathname: "/(main)/home/viewImage",
             params: { uri: image.uri, metadata: JSON.stringify(image.exif)}
         });
     }
