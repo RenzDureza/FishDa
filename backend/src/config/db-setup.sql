@@ -1,7 +1,7 @@
 -- Execute this on your database query shi
 
-CREATE DATABASE IF NOT EXISTS fishda;
-USE fishda;
+CREATE DATABASE IF NOT EXISTS isdaok;
+USE isdaok;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
