@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View, Image, TextInput} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import logo from "@/assets/images/Isda-iconS.png"
+import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
 import { useState } from "react";
@@ -11,7 +11,7 @@ export default function SignUp() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    
+
     const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
     const registerUser = async () => {
@@ -87,7 +87,7 @@ export default function SignUp() {
                         className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
                     </View>
 
-                    <TouchableOpacity 
+                    <TouchableOpacity
 			className="bg-white py-2 px-4 w-40 rounded shadow mt-4"
 			onPress={() => {
 			    registerUser();
@@ -114,7 +114,7 @@ export default function SignUp() {
 
                     <Text className="text-[#0B1D51] text-center mt-4">
                         Already have an account?
-                        <Link href="/signIn" asChild>
+                        <Link href="/signin" asChild>
                             <Text className="text-cyan-500 underline px-1">
                                 Sign In!
                             </Text>
