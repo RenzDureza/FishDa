@@ -2,12 +2,12 @@
 #include <opencv2/core/cvstd_wrapper.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
-#include <vector>
-#define CPPHTTPLIB_MULTIPART_FORM_DATA
-#include "httplib.h"
-
-#include <iostream>
 #include <opencv2/opencv.hpp>
+#include <iostream>
+#include <vector>
+
+#include "httplib.h"
+#define CPPHTTPLIB_MULTIPART_FORM_DATA
 
 using namespace std;
 using namespace cv;
@@ -35,12 +35,12 @@ int main() {
     }
 
     // CSC
-    Mat hsv;
-    cvtColor(img, hsv, COLOR_BGR2HSV);
+    Mat hsv_img;
+    cvtColor(img, hsv_img, COLOR_BGR2HSV);
 
     // CLAHE
     vector<Mat> HSVChannels;
-    split(hsv, HSVChannels);
+    split(hsv_img, HSVChannels);
 
     Ptr<CLAHE> clahe = createCLAHE();
     clahe->setClipLimit(4);
@@ -48,17 +48,17 @@ int main() {
     clahe->apply(HSVChannels[2], update_hsv_v);
 
     update_hsv_v.copyTo(HSVChannels[2]);
-    merge(HSVChannels, hsv);
+    // merge(HSVChannels, hsv_img);
 
-    Mat output;
-    cvtColor(hsv, output, COLOR_HSV2BGR);
+	// Otsu's Thresholding
+	Mat binary_img;
+	Mat hsv_img_V = HSVChannels[2];
+	threshold(hsv_img_V, binary_img, 0, 255, THRESH_OTSU | THRESH_BINARY);
 
-	// For testing
-    // imshow("test", output);
-    // waitKey(0);
-    // destroyAllWindows();
-
-    // imwrite("output.jpg", gray);
+	// imshow("Test", binary_img);
+	// waitKey(0);
+	// destroyAllWindows();
+	
     res.set_content("{\"status\":\"ok\"}", "application/json");
   });
 
