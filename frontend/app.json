@@ -4,7 +4,7 @@
     "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/Isda-IconS.png",
+    "icon": "./assets/images/Isda-iconS.png",
     "scheme": "frontend",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -22,14 +22,14 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/Isda-IconS.png"
+      "favicon": "./assets/images/Isda-iconS.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/Isda-IconS.png",
+          "image": "./assets/images/Isda-iconS.png",
           "imageWidth": 200,
           "resizeMode": "contain"
         }

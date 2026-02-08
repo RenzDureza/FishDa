@@ -11,29 +11,31 @@ type HeaderBarProps = {
     title?: string;
     titleColor?: string;
     titleSize?: number;
+    bgColor?: string;
 };
 
 export default function HeaderBar({
     onPress,
-    size = 48,
+    size = 40,
     color = 'black',
     style = {},
     title,
     titleColor = 'bg-tertiary',
-    titleSize = 30,
+    titleSize = 28,
+    bgColor
 }: HeaderBarProps) {
     const insets = useSafeAreaInsets();
     return(
         <SafeAreaView edges={['top']} className="absolute top-0 w-full">
             <View className={`flex-row items-center ${title ? 'justify-between' : 'justify-start'} px-4`} style={{ paddingTop: insets.top, height: 70}}>
                 
-                <TouchableOpacity onPress={onPress} style={style} className=''>
+                <TouchableOpacity onPress={onPress} style={style}>
                     <Ionicons name="arrow-back-outline" size={size} color={color} /> 
                 </TouchableOpacity>
 
                 {title && (
                     <View>
-                        <Text className={`font-bold`}
+                        <Text className={`font-extrabold`}
                         style={{ fontSize: titleSize, color: titleColor}}
                         >
                         {title}
