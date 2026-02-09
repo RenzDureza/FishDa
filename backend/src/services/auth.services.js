@@ -26,7 +26,7 @@ export const register = async ({ username, email, password }) => {
 };
 
 export const login = async ({ email, password }) => {
-	const sql = "SELECT `id`, `username`, `password` FROM `users` WHERE `email` = ?";
+	const sql = "SELECT `id`, `username`, `password`, `role` FROM `users` WHERE `email` = ?";
 
 	if (!email || !password) {
 		throw new Error("All fields are required");
@@ -49,14 +49,8 @@ export const login = async ({ email, password }) => {
 		status: "success",
 		message: "User Logged In Successfully",
 		userID: result[0].id,
-		username: result[0].username
+		username: result[0].username,
+		role: result[0].role
 	};
 };
 
-export const showUsers = async () => {
-	const sql = "SELECT `id`, `username` FROM `users`";
-
-	const [result] = await db.query(sql);
-
-	return result
-}
