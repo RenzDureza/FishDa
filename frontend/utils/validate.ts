@@ -3,10 +3,15 @@
 //only 1 (.), cannot be at the start or before @
 export const validateEmail = (email: string): string [] => {
     const errors: string[] = [];
-    if(!email) errors.push("Email is required.");
-    // if (!/s/.test())
+    if(!email) {
+        errors.push("Email is required.");
+        return errors;
+    }
     const regex = /^[a-zA-Z0-9?/]+\.?[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|feu\.edu\.ph|fit\.edu\.ph)$/;
-    if(!regex.test(email)) errors.push("Invalid email address.");
+    if(!regex.test(email)){
+        errors.push("Invalid email address.");
+        return errors;
+    } 
     return errors;
 }
 

@@ -30,41 +30,35 @@ export default function SignUp() {
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
+		setSuccess('');
+		setError('');
 		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
-		const validatedEmail = validateEmail(sanitizeEmail(email));
-		const validatedUsername = validateUsername(sanitizeUsername(username));
-		const validatedPassword = validatePassword(sanitizePassword(password));
+		const cleanEmail = sanitizeEmail(email);
+		const cleanUsername = sanitizeUsername(username);
+		const cleanPassword = sanitizePassword(password);
 
 		try {
-			setSuccess('');
-			setError('');
-			// console.log("Email Error: " + emailError);
-			// console.log("Username Error: " + usernameError);
-			// console.log("Password Error: " + passwordError);
-			// console.log("Confirm Password Error: " + confPasswordError);
-			// console.log((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError)
-
 			if (!email || !username || !password) setError("All fields required.");
 			else if ((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError){
 				console.log("Complete.")
 				const res = await fetch(registerURL, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ username, email, password }),
+				body: JSON.stringify({ cleanUsername, cleanEmail, cleanPassword }),
 				});
 
 				const data = await res.json();
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
-					console.log('Success line 54');
+					logIn();
 				} else {
 					setError("Error: " + data.message);
 				}
 			} else {
-				if (emailError) setError("Email is not valid.");
-				else if (!validatedUsername) setError("Username is not valid.");
-				else if (!validatedPassword) setError("Password is not valid.");
+				if (!(emailError.length === 0)) setError("Email is not valid.");
+				else if (!(usernameError.length === 0)) setError("Username is not valid.");
+				else if (!(passwordError.length === 0)) setError("Password is not valid.");
 				else setError ("Error unknown.");
 			}
 		} catch (err) {
