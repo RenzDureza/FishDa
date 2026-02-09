@@ -1,8 +1,4 @@
 #include <iostream>
-#include <opencv2/core.hpp>
-#include <opencv2/core/types.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
 
@@ -12,7 +8,6 @@
 using namespace std;
 using namespace cv;
 using namespace httplib;
-
 int main() {
   Server svr;
 
@@ -24,33 +19,28 @@ int main() {
     }
 
     const auto &file = req.form.get_file("image");
-
     vector<uchar> buffer(file.content.begin(), file.content.end());
     Mat img = imdecode(buffer, IMREAD_COLOR);
-
     if (img.empty()) {
       res.status = 500;
       res.set_content("{\"error\":\"opencv failed\"}", "application/json");
       return;
     }
-	
-	int img_width = img.cols;
-	int img_height = img.rows;
 
-    // CSC
+    int img_width = img.cols;
+    int img_height = img.rows;
+
     Mat hsv_img;
     cvtColor(img, hsv_img, COLOR_BGR2HSV);
 
     vector<Mat> HSVChannels;
     split(hsv_img, HSVChannels);
-    Mat V = HSVChannels[2];
 
-    // CLAHE
     Ptr<CLAHE> clahe = createCLAHE(2.0, Size(8, 8));
     Mat V_clahe;
-    clahe->apply(V, V_clahe);
-    V = V_clahe;
-    HSVChannels[2] = V;
+    clahe->apply(HSVChannels[2], V_clahe);
+
+    HSVChannels[2] = V_clahe;
     merge(HSVChannels, hsv_img);
 
     // Eyes ROI
@@ -71,65 +61,55 @@ int main() {
     // Tail ROI
     Rect tail_roi_rect(img_width * 0.10, img_height * 0.78, img_width * 1.0,
                        img_height * 0.20);
+
     tail_roi_rect &= Rect(0, 0, img.cols, img.rows);
 
-    // Otsu Thresholding
+    Mat eye_roi = img(eye_roi_rect);
+    Mat eye_roi_V = V_clahe(eye_roi_rect);
+
+    Mat eye_V_proc;
+    medianBlur(eye_roi_V, eye_V_proc, 5);
+
     Mat otsu_mask;
-    threshold(V, otsu_mask, 0, 255, THRESH_OTSU + THRESH_BINARY_INV);
+    threshold(eye_V_proc, otsu_mask, 0, 255, THRESH_OTSU + THRESH_BINARY_INV);
 
     Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
-    dilate(otsu_mask, otsu_mask, kernel, Point(-1, -1), 1);
+    dilate(otsu_mask, otsu_mask, kernel);
 
-    // Canny Edge Detection
-    Mat blurred_img, edges_img;
-    GaussianBlur(otsu_mask, blurred_img, Size(5, 5), 0);
-    Canny(blurred_img, edges_img, 50, 150);
+    vector<vector<Point>> contours;
+    findContours(otsu_mask, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
 
-    vector<vector<Point>> EyeContours;
-    findContours(edges_img, EyeContours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    Mat eye_mask = Mat::zeros(eye_roi.size(), CV_8UC1);
+    Mat extracted_eyes = Mat::zeros(eye_roi.size(), CV_8UC3);
 
-    Mat eye_mask = Mat::zeros(img.size(), CV_8UC1);
-    Mat extracted_eyes = Mat::zeros(img.size(), CV_8UC3);
-
-    double circularity_threshold = 0.6;
-    double min_pupil_area = 20;
-    double max_pupil_area = 800;
-
-    for (auto &c : EyeContours) {
+    for (auto &c : contours) {
       double area = contourArea(c);
       double perimeter = arcLength(c, true);
       if (perimeter == 0)
         continue;
-
       double circularity = 4 * CV_PI * area / (perimeter * perimeter);
 
-      if (circularity > circularity_threshold && area > min_pupil_area &&
-          area < max_pupil_area) {
-
+      if (circularity > 0.5 && area > 20 && area < 800) {
         Point2f center;
         float radius;
         minEnclosingCircle(c, center, radius);
 
-        int margin = 20;
-        if (center.x < margin || center.y < margin ||
-            center.x > img.cols - margin || center.y > img.rows - margin)
+        if (center.x < 5 || center.y < 5 || center.x > eye_roi.cols - 5 ||
+            center.y > eye_roi.rows - 5)
           continue;
 
-        if (radius < 3 || radius > 25)
-          continue;
-
-        int cx = (int)center.x;
-        int cy = (int)center.y;
-        uchar v = V.at<uchar>(cy, cx);
-        if (v > 120)
-          continue;
-
-        float eyeRadius = radius * 1.5f;
-        circle(eye_mask, center, (int)eyeRadius, Scalar(255), FILLED);
+        circle(eye_mask, center, (int)(radius * 2.0), Scalar(255), FILLED);
       }
     }
 
-    img.copyTo(extracted_eyes, eye_mask);
+    if (countNonZero(eye_mask) == 0) {
+      double minVal;
+      Point minLoc;
+      minMaxLoc(eye_roi_V, &minVal, nullptr, &minLoc, nullptr);
+      circle(eye_mask, minLoc, eye_roi.cols * 0.08, Scalar(255), FILLED);
+    }
+
+    eye_roi.copyTo(extracted_eyes, eye_mask);
 
     // Get eye score
     Mat hsv_eye;
@@ -137,12 +117,12 @@ int main() {
 
     Mat gray_eye;
     cvtColor(extracted_eyes, gray_eye, COLOR_BGR2GRAY);
-    int total_pixel_eyes = countNonZero(gray_eye);
+    int total_pixel_eyes = countNonZero(eye_mask);
 
     Mat red_mask1, red_mask2, red_mask;
     inRange(hsv_eye, Scalar(0, 50, 50), Scalar(10, 255, 255), red_mask1);
     inRange(hsv_eye, Scalar(160, 50, 50), Scalar(179, 255, 255), red_mask2);
-    red_mask = red_mask1 | red_mask2;
+    red_mask = (red_mask1 | red_mask2) & eye_mask;
 
     int red_count = countNonZero(red_mask);
     double red_ratio =
@@ -156,15 +136,13 @@ int main() {
                              : 0.0;
 
     double eye_score = (1.0 - red_ratio) * 0.4 + eye_clarity * 0.6;
+    cout << "Eye Score: " << eye_score << endl;
 
-    // For debugging to!!!
-    // imshow("Extracted Eyes", extracted_eyes);
-    // waitKey(0);
-    // destroyAllWindows();
+    imshow("Otsu Mask", otsu_mask);
+    imshow("Extracted Eyes", extracted_eyes);
+    waitKey(1);
 
-    res.set_content(
-        "{\"status\":\"ok\", \"eye_score\":" + to_string(eye_score) + "}",
-        "application/json");
+    res.set_content("{\"status\":\"ok\"}", "application/json");
   });
 
   cout << "Server running on http://0.0.0.0:8080\n";
