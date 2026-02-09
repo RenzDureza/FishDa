@@ -138,9 +138,48 @@ int main() {
     double eye_score = (1.0 - red_ratio) * 0.4 + eye_clarity * 0.6;
     cout << "Eye Score: " << eye_score << endl;
 
-    imshow("Otsu Mask", otsu_mask);
-    imshow("Extracted Eyes", extracted_eyes);
-    waitKey(1);
+    // Gill
+    Mat gill_roi = img(gill_roi_rect);
+    Mat gill_roi_hsv = hsv_img(gill_roi_rect);
+
+    bool gill_found = false;
+    float gill_score = 0.0;
+    int total_pixel_gills = gill_roi.rows * gill_roi.cols;
+
+    if (total_pixel_gills > 0) {
+      Mat red_mask1_gills, red_mask2_gills, red_mask_gills;
+      inRange(hsv_eye, Scalar(0, 50, 50), Scalar(10, 255, 255),
+              red_mask1_gills);
+      inRange(hsv_eye, Scalar(160, 50, 50), Scalar(179, 255, 255),
+              red_mask2_gills);
+      red_mask_gills = red_mask1_gills | red_mask2_gills;
+
+      Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+      morphologyEx(red_mask_gills, red_mask_gills, MORPH_OPEN, kernel);
+
+      int red_count_gills = countNonZero(red_mask_gills);
+
+      if (red_count_gills > 50) {
+        vector<Mat> GillHSVChannels;
+        split(gill_roi_hsv, GillHSVChannels);
+        Mat gill_hsv_h = GillHSVChannels[0];
+        Mat gill_hsv_s = GillHSVChannels[1];
+
+        Scalar gill_hsv_h_mean = mean(gill_hsv_h, red_mask_gills);
+        Scalar gill_hsv_s_mean = mean(gill_hsv_s, red_mask_gills);
+
+        float gill_hsv_h_score = gill_hsv_h_mean[0] / 180;
+        float gill_hsv_s_score = gill_hsv_s_mean[0] / 255;
+
+        gill_score = (gill_hsv_h_score + gill_hsv_s_score) / 2;
+        gill_found = true;
+      }
+    }
+	
+	// Debugging Shits!
+    //imshow("Otsu Mask", otsu_mask);
+    // imshow("Extracted Eyes", extracted_eyes);
+    // waitKey(1);
 
     res.set_content("{\"status\":\"ok\"}", "application/json");
   });
