@@ -2,11 +2,10 @@ import { Text, TouchableOpacity, View, Image } from "react-native";
 import logo from "@/assets/images/Isda-AS.png";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
-import { useContext } from "react";
-import { AuthContext } from "@/utils/authContext";
+import { useAuth } from "@/utils/authContext";
 
 export default function AdminHome() {
-	const authState = useContext(AuthContext);
+	const { logOut } = useAuth();
 	return (
 		<SafeAreaView className="flex-1 space-y-4 items-center justify-center bg-[#FFE3A9] px-4">
 			<View className="space-y-6 items-center">
@@ -21,7 +20,7 @@ export default function AdminHome() {
 					<Text className="text-center font-semibold text-[#0B1D51] ">Manage Users</Text>
 				</TouchableOpacity>
 
-				<TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => { authState.logOut() }}>
+				<TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => { logOut() }}>
 					<Text className="text-center font-semibold text-[#0B1D51] ">Logout</Text>
 				</TouchableOpacity>
 

@@ -2,11 +2,11 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { Link, router } from "expo-router";
-import { useContext, useState } from "react";
+import { Link } from "expo-router";
+import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
-import { AuthContext } from "@/utils/authContext";
+import { useAuth } from "@/utils/authContext";
 import { sanitizeEmail, sanitizePassword, sanitizeUsername } from "@/utils/sanitize";
 import { validateEmail, validatePassword, validateUsername } from "@/utils/validate";
 
@@ -22,7 +22,7 @@ export default function SignUp() {
 	const [usernameError, setUsernameErorr] = useState<string[]>([])
 	const [confPasswordError, setConfPasswordError] = useState<boolean>("");
 		
-	const authState = useContext(AuthContext)
+	const { logIn } = useAuth();
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
@@ -51,6 +51,7 @@ export default function SignUp() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
+					logIn();
 				} else {
 					setError("Error: " + data.message);
 				}
@@ -73,7 +74,7 @@ export default function SignUp() {
 				promptMessage: 'Login via Authentication'
 			});
 			if (biometricsResult.success){
-				authState.logIn();
+				logIn();
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}
