@@ -33,9 +33,6 @@ export default function SignUp() {
 		setSuccess('');
 		setError('');
 		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
-		// const validatedEmail = validateEmail(sanitizeEmail(email));
-		// const validatedUsername = validateUsername(sanitizeUsername(username));
-		// const validatedPassword = validatePassword(sanitizePassword(password));
 
 		try {
 			if (!email || !username || !password) setError("All fields required.");

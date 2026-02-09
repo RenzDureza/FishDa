@@ -21,9 +21,9 @@ export default function SignIn() {
 	const { logIn } = useAuth();
 
 	const loginUser = async () => {
+		setSuccess('');
+		setError('');
 		try {
-			setSuccess('');
-			setError('');
 			if(!email || !password) setError('All fields required');
 			else if(!(emailError.length === 0)) setError('Invalid email.');
 			else {
