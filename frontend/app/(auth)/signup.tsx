@@ -15,31 +15,31 @@ export default function SignUp() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confPassword, setConfPassword] = useState("");
+
+	//General Success/Error text
 	const [success, setSuccess] = useState("");
 	const [error, setError] = useState("");
+
+	//Error texts per input
 	const [emailError, setEmailError] = useState("");
 	const [passwordError, setPasswordErorr] = useState<string[]>([]); 
 	const [usernameError, setUsernameErorr] = useState<string[]>([])
-	const [confPasswordError, setConfPasswordError] = useState<boolean>("");
-		
+	const [confPasswordError, setConfPasswordError] = useState<boolean>();
+
 	const authState = useContext(AuthContext)
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
-		const cleanEmail = sanitizeEmail(email);
-		const cleanUsername = sanitizeUsername(username);
-		const cleanPassword = sanitizePassword(password);
-		const cleanConfPassword = sanitizePassword(confPassword);
-		console.log("e: ", cleanEmail, "u: ", cleanUsername, "p: ", cleanPassword);
-		const eError = validateEmail(cleanEmail);
-		const pErrors = validatePassword(cleanPassword);
+		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
+		const validatedEmail = validateEmail(sanitizeEmail(email));
+		const validatedUsername = validateUsername(sanitizeUsername(username));
+		const validatedPassword = validatePassword(sanitizePassword(password));
 
 		try {
 			setSuccess('');
 			setError('');
 			if (!email || !username || !password) setError("All fields required.");
-			else if (cleanPassword != cleanConfPassword) setError("Passwords does not match.");
-			else if (validateUsername(username) && validateEmail(email) && validatePassword(password)){
+			else if (validatedEmail && validatedUsername && validatedPassword){
 				const res = await fetch(registerURL, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -55,9 +55,9 @@ export default function SignUp() {
 					setError("Error: " + data.message);
 				}
 			} else {
-				if (!validateEmail(cleanEmail)) setError("Email is not valid.");
-				else if (!validateUsername(cleanUsername)) setError("Username is not valid.");
-				else if (!validatePassword(cleanPassword)) setError("Password is not valid.");
+				if (!validatedEmail) setError("Email is not valid.");
+				else if (!validatedUsername) setError("Username is not valid.");
+				else if (!validatedPassword) setError("Password is not valid.");
 				else setError ("Error unknown.");
 			}
 		} catch (err) {
