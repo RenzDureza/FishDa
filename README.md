@@ -1,5 +1,5 @@
-# FishDa
-- A fish freshness detection app that relies on classical image processing techniques only.
+# IsdaOK
+- A fish quality assessment app that relies on classical image processing techniques only.
 
 ## How to Clone:
 1. Install dependencies:
