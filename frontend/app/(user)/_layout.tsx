@@ -2,7 +2,12 @@ import { Stack, Redirect, Slot } from "expo-router";
 import { useAuth } from "../../utils/authContext";
 
 export default function UserLayout() {
-	const { isLoggedIn } = useAuth();
+	const { isLoggedIn, isReady } = useAuth();
+
+	if(!isReady) {
+		return null;
+	}
+
 	if(!isLoggedIn){
 		return <Redirect href="/(auth)/signin" />
 	}
