@@ -1,9 +1,11 @@
 #include <opencv2/core.hpp>
 #include <opencv2/core/cvstd_wrapper.hpp>
+#include <opencv2/core/types.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <regex>
 #include <vector>
 
 #include "httplib.h"
@@ -54,8 +56,13 @@ int main() {
 	Mat binary_img;
 	Mat hsv_img_V = HSVChannels[2];
 	threshold(hsv_img_V, binary_img, 0, 255, THRESH_OTSU | THRESH_BINARY);
+	
+	// Canny Edge Detection
+	Mat blurred_img, edges_img;
+	GaussianBlur(binary_img, blurred_img, Size(3, 3), 0);
+	Canny(blurred_img, edges_img, 50, 150, 3);
 
-	// imshow("Test", binary_img);
+	// imshow("Test", edges_img);
 	// waitKey(0);
 	// destroyAllWindows();
 	
