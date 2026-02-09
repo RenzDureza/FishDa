@@ -18,7 +18,7 @@ export const validateEmail = (email: string): string [] => {
 //Alphanumeric _ . 3-16 chars
 export const validateUsername = (username: string): string [] => {
     const errors: string[] = [];
-    const regex = /^[a-z0-9_.]+$/;
+    const regex = /^[a-zA-Z0-9_.]+$/;
     if(!username){
         errors.push("Username is required.");
         return errors;
