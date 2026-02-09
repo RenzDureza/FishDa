@@ -30,20 +30,11 @@ export default function SignUp() {
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
+		setSuccess('');
+		setError('');
 		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
-		// const validatedEmail = validateEmail(sanitizeEmail(email));
-		// const validatedUsername = validateUsername(sanitizeUsername(username));
-		// const validatedPassword = validatePassword(sanitizePassword(password));
 
 		try {
-			setSuccess('');
-			setError('');
-			// console.log("Email Error: " + emailError);
-			// console.log("Username Error: " + usernameError);
-			// console.log("Password Error: " + passwordError);
-			// console.log("Confirm Password Error: " + confPasswordError);
-			// console.log((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError)
-
 			if (!email || !username || !password) setError("All fields required.");
 			else if ((emailError.length === 0) && (usernameError.length === 0) && (passwordError.length === 0) && !confPasswordError){
 				console.log("Complete.")
