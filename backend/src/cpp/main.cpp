@@ -8,6 +8,9 @@
 using namespace std;
 using namespace cv;
 using namespace httplib;
+
+float GetPercentile(Mat src, float percentile);
+
 int main() {
   Server svr;
 
@@ -136,7 +139,6 @@ int main() {
                              : 0.0;
 
     double eye_score = (1.0 - red_ratio) * 0.4 + eye_clarity * 0.6;
-    cout << "Eye Score: " << eye_score << endl;
 
     // Gill
     Mat gill_roi = img(gill_roi_rect);
@@ -175,15 +177,72 @@ int main() {
         gill_found = true;
       }
     }
-	
-	// Debugging Shits!
-    //imshow("Otsu Mask", otsu_mask);
-    // imshow("Extracted Eyes", extracted_eyes);
-    // waitKey(1);
+
+    // Body
+    Mat body_roi = img(body_roi_rect);
+    Mat body_roi_hsv = hsv_img(body_roi_rect);
+
+    double body_score;
+
+    vector<Mat> BodyHSVChannel;
+    split(body_roi_hsv, BodyHSVChannel);
+    Mat body_roi_s = BodyHSVChannel[1];
+    Mat body_roi_v = BodyHSVChannel[2];
+
+    int total_pixel_body = body_roi.rows * body_roi.cols;
+
+    float top_value_threshold = GetPercentile(body_roi_v, 85.0);
+    float low_saturation_threshold = GetPercentile(body_roi_s, 30.0);
+
+    Mat highlight_mask;
+    inRange(body_roi_v, top_value_threshold, 255, highlight_mask);
+    Mat low_sat_mask;
+    inRange(body_roi_s, 0, low_saturation_threshold, low_sat_mask);
+    highlight_mask = highlight_mask & low_sat_mask;
+
+    int shine_pixels = countNonZero(highlight_mask);
+    double shine_score = (double)shine_pixels / total_pixel_body;
+
+    Scalar mean_sat = mean(body_roi_s);
+    double color_score = mean_sat[0] / 255.0;
+
+    body_score = (color_score * 0.6) + (shine_score * 0.4);
+
+    // Debugging Shits!
+    imshow("Otsu Mask", body_roi);
+    imshow("Extracted Eyes", eye_roi);
+    cout << "Eye Score: " << eye_score << endl;
+    cout << "Gills Score: " << gill_score << endl;
+    cout << "Body Score: " << body_score << endl;
+    waitKey(1);
 
     res.set_content("{\"status\":\"ok\"}", "application/json");
   });
 
   cout << "Server running on http://0.0.0.0:8080\n";
   svr.listen("0.0.0.0", 8080);
+}
+
+float GetPercentile(Mat src, float percentile) {
+  if (src.empty())
+    return 0;
+  Mat flat;
+  src.reshape(1, 1).copyTo(flat);
+
+  cv::sort(flat, flat, SORT_EVERY_ROW + SORT_ASCENDING);
+
+  int total_pixels = flat.cols;
+  int index = cvFloor(((double)total_pixels) * (percentile / 100.0));
+
+  if (index >= total_pixels)
+    index = total_pixels - 1;
+  if (index < 0)
+    index = 0;
+
+  if (src.depth() == CV_8U) {
+    return static_cast<double>(flat.at<uchar>(index));
+  } else if (src.depth() == CV_32F) {
+    return static_cast<double>(flat.at<float>(index));
+  }
+  return 0;
 }
