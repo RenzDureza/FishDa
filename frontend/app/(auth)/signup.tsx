@@ -15,50 +15,56 @@ export default function SignUp() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [confPassword, setConfPassword] = useState("");
+
+	//General Success/Error text
 	const [success, setSuccess] = useState("");
 	const [error, setError] = useState("");
-	const [emailError, setEmailError] = useState("");
+
+	//Error texts per input
+	const [emailError, setEmailError] = useState<string[]>([]);
 	const [passwordError, setPasswordErorr] = useState<string[]>([]); 
 	const [usernameError, setUsernameErorr] = useState<string[]>([])
-	const [confPasswordError, setConfPasswordError] = useState<boolean>("");
+	const [confPasswordError, setConfPasswordError] = useState<boolean>();
 		
 	const { logIn } = useAuth();
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
-		const cleanEmail = sanitizeEmail(email);
-		const cleanUsername = sanitizeUsername(username);
-		const cleanPassword = sanitizePassword(password);
-		const cleanConfPassword = sanitizePassword(confPassword);
-		console.log("e: ", cleanEmail, "u: ", cleanUsername, "p: ", cleanPassword);
-		const eError = validateEmail(cleanEmail);
-		const pErrors = validatePassword(cleanPassword);
+		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
+		const validatedEmail = validateEmail(sanitizeEmail(email));
+		const validatedUsername = validateUsername(sanitizeUsername(username));
+		const validatedPassword = validatePassword(sanitizePassword(password));
 
 		try {
 			setSuccess('');
 			setError('');
+			// console.log("Email Error: " + emailError);
+			// console.log("Username Error: " + usernameError);
+			// console.log("Password Error: " + passwordError);
+			// console.log("Confirm Password Error: " + confPasswordError);
+			// console.log((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError)
+
 			if (!email || !username || !password) setError("All fields required.");
-			else if (cleanPassword != cleanConfPassword) setError("Passwords does not match.");
-			else if (validateUsername(username) && validateEmail(email) && validatePassword(password)){
+			else if ((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError){
+				console.log("Complete.")
 				const res = await fetch(registerURL, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ username, email, password }),
 				});
 
-				console.log("Success");
 				const data = await res.json();
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
-					logIn();
+					console.log('Success line 54');
 				} else {
 					setError("Error: " + data.message);
 				}
 			} else {
-				if (!validateEmail(cleanEmail)) setError("Email is not valid.");
-				else if (!validateUsername(cleanUsername)) setError("Username is not valid.");
-				else if (!validatePassword(cleanPassword)) setError("Password is not valid.");
+				if (emailError) setError("Email is not valid.");
+				else if (!validatedUsername) setError("Username is not valid.");
+				else if (!validatedPassword) setError("Password is not valid.");
 				else setError ("Error unknown.");
 			}
 		} catch (err) {
@@ -89,7 +95,7 @@ export default function SignUp() {
 
 				<Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain" />
 				<View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
-					<Text className="text-3xl text-[#0B1D51] font-semibold">
+					<Text className="text-3xl text-[#0B1D51] font-semibold mb-2">
 						Sign Up
 					</Text>
 
@@ -115,7 +121,7 @@ export default function SignUp() {
 						<TextInput
 							value={username} //remove quotation and comment
 							onChangeText={setUsername}
-							onBlur={() => setUsernameErorr(validateUsername(sanitizeUsername(username)))}
+							onBlur={() => setUsernameErorr(validateUsername(username))}
 							placeholder="Juan Dela Cruz"
 							keyboardType="email-address"
 							autoCapitalize="none"
