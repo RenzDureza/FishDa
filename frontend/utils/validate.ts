@@ -3,7 +3,7 @@
 //only 1 (.), cannot be at the start or before @
 export const validateEmail = (email: string): string [] => {
     const errors: string[] = [];
-    if(!email) {
+    if(!email){
         errors.push("Email is required.");
         return errors;
     }
@@ -11,7 +11,7 @@ export const validateEmail = (email: string): string [] => {
     if(!regex.test(email)){
         errors.push("Invalid email address.");
         return errors;
-    } 
+    }
     return errors;
 }
 
