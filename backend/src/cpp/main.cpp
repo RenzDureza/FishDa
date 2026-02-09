@@ -33,6 +33,9 @@ int main() {
       res.set_content("{\"error\":\"opencv failed\"}", "application/json");
       return;
     }
+	
+	int img_width = img.cols;
+	int img_height = img.rows;
 
     // CSC
     Mat hsv_img;
@@ -49,6 +52,26 @@ int main() {
     V = V_clahe;
     HSVChannels[2] = V;
     merge(HSVChannels, hsv_img);
+
+    // Eyes ROI
+    Rect eye_roi_rect(img_width * 0.20, img_height * 0.05, img_width * 0.60,
+                      img_height * 0.10);
+    eye_roi_rect &= Rect(0, 0, img.cols, img.rows);
+
+    // Gills ROI
+    Rect gill_roi_rect(img_width * 0.20, img_height * 0.14, img_width * 0.60,
+                       img_height * 0.10);
+    gill_roi_rect &= Rect(0, 0, img.cols, img.rows);
+
+    // Body ROI
+    Rect body_roi_rect(img_width * 0.20, img_height * 0.24, img_width * 0.60,
+                       img_height * 0.55);
+    body_roi_rect &= Rect(0, 0, img.cols, img.rows);
+
+    // Tail ROI
+    Rect tail_roi_rect(img_width * 0.10, img_height * 0.78, img_width * 1.0,
+                       img_height * 0.20);
+    tail_roi_rect &= Rect(0, 0, img.cols, img.rows);
 
     // Otsu Thresholding
     Mat otsu_mask;
@@ -107,8 +130,8 @@ int main() {
     }
 
     img.copyTo(extracted_eyes, eye_mask);
-	
-	// Get eye score
+
+    // Get eye score
     Mat hsv_eye;
     cvtColor(extracted_eyes, hsv_eye, COLOR_BGR2HSV);
 
@@ -122,22 +145,26 @@ int main() {
     red_mask = red_mask1 | red_mask2;
 
     int red_count = countNonZero(red_mask);
-    double red_ratio = (total_pixel_eyes > 0) ? (double)red_count / total_pixel_eyes : 0.0;
+    double red_ratio =
+        (total_pixel_eyes > 0) ? (double)red_count / total_pixel_eyes : 0.0;
 
     Mat eye_edges;
     Canny(gray_eye, eye_edges, 50, 150);
     int strong_edges_count = countNonZero(eye_edges);
-    double eye_clarity = (total_pixel_eyes > 0) ? (double)strong_edges_count / total_pixel_eyes : 0.0;
+    double eye_clarity = (total_pixel_eyes > 0)
+                             ? (double)strong_edges_count / total_pixel_eyes
+                             : 0.0;
 
     double eye_score = (1.0 - red_ratio) * 0.4 + eye_clarity * 0.6;
 
-	// For debugging to!!!
+    // For debugging to!!!
     // imshow("Extracted Eyes", extracted_eyes);
     // waitKey(0);
-	// destroyAllWindows();
+    // destroyAllWindows();
 
-    res.set_content("{\"status\":\"ok\", \"eye_score\":" + to_string(eye_score) + "}", "application/json");
-
+    res.set_content(
+        "{\"status\":\"ok\", \"eye_score\":" + to_string(eye_score) + "}",
+        "application/json");
   });
 
   cout << "Server running on http://0.0.0.0:8080\n";
