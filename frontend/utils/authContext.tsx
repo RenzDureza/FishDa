@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useState } from "react";
+import { createContext, PropsWithChildren, useState, useContext } from "react";
 import { useRouter } from "expo-router";
 
 type AuthState = {
@@ -7,11 +7,14 @@ type AuthState = {
     logOut: () => void;
 };
 
+export const AuthContext = createContext<AuthState | undefined>(undefined);
+/*
 export const AuthContext = createContext<AuthState>({
     isLoggedIn: false,
     logIn: () => {},
     logOut: () => {},
 });
+*/
 
 export function AuthProvider({ children }: PropsWithChildren){
     const [isLoggedIn, setLoggedIn] = useState(false);
@@ -19,7 +22,7 @@ export function AuthProvider({ children }: PropsWithChildren){
 
     const logIn = () => {
         setLoggedIn(true);
-        router.replace("/home");
+        router.replace("/(user)/(drawer)/home");
     }
     const logOut = () => {
         setLoggedIn(false);
@@ -31,4 +34,14 @@ export function AuthProvider({ children }: PropsWithChildren){
             {children}
         </AuthContext.Provider>
     )
+}
+
+export function useAuth(): AuthState {
+    const context = useContext(AuthContext);
+
+    if (!context) {
+        throw new Error("useAuth must be used within an AuthProvider");
+    }
+
+    return context;
 }

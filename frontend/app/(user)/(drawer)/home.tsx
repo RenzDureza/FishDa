@@ -1,11 +1,10 @@
 import { Text, TouchableOpacity, View, Image} from "react-native";
 import logo from "@/assets/images/Isda-iconS.png";
 import { router } from "expo-router";
-import { AuthContext } from "@/utils/authContext";
-import { useContext } from "react";
+import { useAuth } from "@/utils/authContext";
 
 export default function Home() {
-  const authState = useContext(AuthContext);
+  const { logOut } = useAuth();
   return (
     <View className="flex-1 space-y-4 items-center justify-center bg-primary px-4">
 
@@ -27,7 +26,7 @@ export default function Home() {
 
         <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" // Placeholder logout
             onPress={() => {
-                authState.logOut();
+                logOut();
             }}>
         <Text className="text-center font-semibold text-[#0B1D51] ">Sign Out</Text>
         </TouchableOpacity>
