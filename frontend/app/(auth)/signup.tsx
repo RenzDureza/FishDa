@@ -2,11 +2,11 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { Link, router } from "expo-router";
-import { useContext, useState } from "react";
+import { Link } from "expo-router";
+import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
-import { AuthContext } from "@/utils/authContext";
+import { useAuth } from "@/utils/authContext";
 import { sanitizeEmail, sanitizePassword, sanitizeUsername } from "@/utils/sanitize";
 import { validateEmail, validatePassword, validateUsername } from "@/utils/validate";
 
@@ -21,12 +21,12 @@ export default function SignUp() {
 	const [error, setError] = useState("");
 
 	//Error texts per input
-	const [emailError, setEmailError] = useState("");
+	const [emailError, setEmailError] = useState<string[]>([]);
 	const [passwordError, setPasswordErorr] = useState<string[]>([]); 
 	const [usernameError, setUsernameErorr] = useState<string[]>([])
 	const [confPasswordError, setConfPasswordError] = useState<boolean>();
-
-	const authState = useContext(AuthContext)
+		
+	const { logIn } = useAuth();
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
@@ -38,24 +38,31 @@ export default function SignUp() {
 		try {
 			setSuccess('');
 			setError('');
+			// console.log("Email Error: " + emailError);
+			// console.log("Username Error: " + usernameError);
+			// console.log("Password Error: " + passwordError);
+			// console.log("Confirm Password Error: " + confPasswordError);
+			// console.log((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError)
+
 			if (!email || !username || !password) setError("All fields required.");
-			else if (validatedEmail && validatedUsername && validatedPassword){
+			else if ((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError){
+				console.log("Complete.")
 				const res = await fetch(registerURL, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ username, email, password }),
 				});
 
-				console.log("Success");
 				const data = await res.json();
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
+					console.log('Success line 54');
 				} else {
 					setError("Error: " + data.message);
 				}
 			} else {
-				if (!validatedEmail) setError("Email is not valid.");
+				if (emailError) setError("Email is not valid.");
 				else if (!validatedUsername) setError("Username is not valid.");
 				else if (!validatedPassword) setError("Password is not valid.");
 				else setError ("Error unknown.");
@@ -73,7 +80,7 @@ export default function SignUp() {
 				promptMessage: 'Login via Authentication'
 			});
 			if (biometricsResult.success){
-				authState.logIn();
+				logIn();
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}
@@ -88,7 +95,7 @@ export default function SignUp() {
 
 				<Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain" />
 				<View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
-					<Text className="text-3xl text-[#0B1D51] font-semibold">
+					<Text className="text-3xl text-[#0B1D51] font-semibold mb-2">
 						Sign Up
 					</Text>
 
@@ -114,7 +121,7 @@ export default function SignUp() {
 						<TextInput
 							value={username} //remove quotation and comment
 							onChangeText={setUsername}
-							onBlur={() => setUsernameErorr(validateUsername(sanitizeUsername(username)))}
+							onBlur={() => setUsernameErorr(validateUsername(username))}
 							placeholder="Juan Dela Cruz"
 							keyboardType="email-address"
 							autoCapitalize="none"

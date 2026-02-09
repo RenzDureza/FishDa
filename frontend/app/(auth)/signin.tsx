@@ -3,8 +3,8 @@ import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
 import { Link } from "expo-router";
-import { useContext, useState } from "react";
-import { AuthContext } from "../../utils/authContext";
+import { useState } from "react";
+import { useAuth } from "../../utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
 
@@ -13,7 +13,7 @@ export default function SignIn() {
 	const [password, setPassword] = useState("");
 
 	const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
-	const authState = useContext(AuthContext);
+	const { logIn } = useAuth();
 
 	const loginUser = async () => {
 		try {
@@ -27,7 +27,7 @@ export default function SignIn() {
 
 			if (res.ok && data.status === "success") {
 				Alert.alert("Success", data.message);
-				authState.logIn();
+				logIn();
 			} else {
 				Alert.alert("Error: " + data.message);
 			}
@@ -43,7 +43,7 @@ export default function SignIn() {
 			});
 
 			if (biometricsResult.success){
-				authState.logIn();
+				logIn();
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}

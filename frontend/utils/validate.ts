@@ -1,10 +1,13 @@
-//@gmail.com @yahoo.com @outlook.com @hotmail.com @feu.edu.ph @fit.edu.ph case-insensitive
-export const validateEmail = (email: string): string => {
-    if(!email) return "Email is required.";
+//@gmail.com @yahoo.com @outlook.com @hotmail.com @feu.edu.ph @fit.edu.ph
+//accepts uppercase but treated as one in database
+//only 1 (.), cannot be at the start or before @
+export const validateEmail = (email: string): string [] => {
+    const errors: string[] = [];
+    if(!email) errors.push("Email is required.");
     // if (!/s/.test())
-    const regex = /^[a-zA-Z\.]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|feu\.edu\.ph|fit\.edu\.ph)$/i;
-    if(!regex.test(email)) return "Invalid email address.";
-    return "";
+    const regex = /^[a-zA-Z0-9?/]+\.?[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|feu\.edu\.ph|fit\.edu\.ph)$/;
+    if(!regex.test(email)) errors.push("Invalid email address.");
+    return errors;
 }
 
 //Alphanumeric _ . 3-16 chars
