@@ -22,8 +22,8 @@ export default function SignUp() {
 
 	//Error texts per input
 	const [emailError, setEmailError] = useState<string[]>([]);
-	const [passwordError, setPasswordErorr] = useState<string[]>([]); 
-	const [usernameError, setUsernameErorr] = useState<string[]>([])
+	const [passwordError, setPasswordError] = useState<string[]>([]); 
+	const [usernameError, setUsernameError] = useState<string[]>([])
 	const [confPasswordError, setConfPasswordError] = useState<boolean>();
 		
 	const { logIn } = useAuth();
@@ -31,9 +31,9 @@ export default function SignUp() {
 
 	const registerUser = async () => {
 		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
-		const validatedEmail = validateEmail(sanitizeEmail(email));
-		const validatedUsername = validateUsername(sanitizeUsername(username));
-		const validatedPassword = validatePassword(sanitizePassword(password));
+		// const validatedEmail = validateEmail(sanitizeEmail(email));
+		// const validatedUsername = validateUsername(sanitizeUsername(username));
+		// const validatedPassword = validatePassword(sanitizePassword(password));
 
 		try {
 			setSuccess('');
@@ -45,27 +45,27 @@ export default function SignUp() {
 			// console.log((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError)
 
 			if (!email || !username || !password) setError("All fields required.");
-			else if ((emailError.length === 0) && (passwordError.length === 0) && (passwordError.length === 0) && !confPasswordError){
+			else if ((emailError.length === 0) && (usernameError.length === 0) && (passwordError.length === 0) && !confPasswordError){
 				console.log("Complete.")
 				const res = await fetch(registerURL, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ username, email, password }),
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ username, email, password }),
 				});
 
 				const data = await res.json();
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
-					console.log('Success line 54');
+					logIn();
 				} else {
-					setError("Error: " + data.message);
+					setError(data.message);
 				}
 			} else {
-				if (emailError) setError("Email is not valid.");
-				else if (!validatedUsername) setError("Username is not valid.");
-				else if (!validatedPassword) setError("Password is not valid.");
-				else setError ("Error unknown.");
+				if (!(emailError.length === 0)) setError("Invalid email.");
+				else if (!(usernameError.length === 0)) setError("Invalid username.");
+				else if (!(passwordError.length === 0)) setError("Invalid password.");
+				else setError ("Error");
 			}
 		} catch (err) {
 			setError ("Error hi" + String(err));
@@ -121,7 +121,7 @@ export default function SignUp() {
 						<TextInput
 							value={username} //remove quotation and comment
 							onChangeText={setUsername}
-							onBlur={() => setUsernameErorr(validateUsername(username))}
+							onBlur={() => setUsernameError(validateUsername(username))}
 							placeholder="Juan Dela Cruz"
 							keyboardType="email-address"
 							autoCapitalize="none"
@@ -139,7 +139,7 @@ export default function SignUp() {
 						<TextInput
 							value={password} //remove quotation and comment
 							onChangeText={setPassword}
-							onBlur={() => setPasswordErorr(validatePassword(sanitizePassword(password)))}
+							onBlur={() => setPasswordError(validatePassword(sanitizePassword(password)))}
 							placeholder="***************"
 							secureTextEntry
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />

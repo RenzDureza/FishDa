@@ -7,32 +7,49 @@ import { useState } from "react";
 import { useAuth } from "../../utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
+import { sanitizeEmail } from "@/utils/sanitize";
+import { validateEmail } from "@/utils/validate";
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
+	const [success, setSuccess] = useState("");
+	const [error, setError] = useState("");
+	const [emailError, setEmailError] = useState<string[]>([]);
 
 	const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
 	const { logIn } = useAuth();
 
 	const loginUser = async () => {
 		try {
-			const res = await fetch(loginURL, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password }),
-			});
+			setSuccess('');
+			setError('');
+			if(!email || !password) setError('All fields required');
+			else if(!(emailError.length === 0)) setError('Invalid email.');
+			else {
+				console.log('Valid email');
+				const res = await fetch(loginURL, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ email, password }),
+				});
 
-			const data = await res.json();
+				const data = await res.json();
 
-			if (res.ok && data.status === "success") {
-				Alert.alert("Success", data.message);
-				logIn();
-			} else {
-				Alert.alert("Error: " + data.message);
+				if(email != data.exist) setError('Email does not exist.');
+				if(password != data.correctPassword) setError('Invalid password.');
+
+				if (res.ok && data.status === "success") {
+					setSuccess("Success" + data.message);
+					logIn();
+				} else {
+					setError(data.message);
+				}
 			}
 		} catch (err) {
+			setError("Error:" + String(err));
 			Alert.alert("Error:", String(err));
+			console.log("Error:" + String(err));
 		}
 	}
 
@@ -57,24 +74,26 @@ export default function SignIn() {
 			<SafeAreaView className="min-h-screen flex items-center justify-center bg-[#8CCDEB] px-4">
 				<Image source={logo} style={{ width: 128, height: 128 }} resizeMode="contain" />
 				<View className="w-full max-w-md rounded-xl items-center justify-center bg-[#FFE3A9] py-4 px-6">
-					<Text className="text-3xl text-[#0B1D51] font-semibold">
+					<Text className="text-3xl text-[#0B1D51] font-semibold mb-2">
 						Sign In
 					</Text>
 
-					<Text className="text-[#FFE3A9] mt-4">
-						Message Error/Success
-					</Text>
+					{success ? <Text className="text-green-700 mx-4">{success}</Text> : null }
+					{error ? <Text className="text-red-600 mx-4">{error}</Text> : null }
 
 					<View className="mt-1">
 						<Text className="">Email</Text>
 						<TextInput
 							value={email} //remove quotation and comment
 							onChangeText={setEmail}
+							onBlur={() => setEmailError(validateEmail(sanitizeEmail(email)))}
 							placeholder="JuanDelaCruz@email.com"
 							keyboardType="email-address"
 							autoCapitalize="none"
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
 					</View>
+
+					{emailError ? <Text className="text-red-600 mx-2">{emailError}</Text> : null }
 
 					<View className="mt-4">
 						<Text className="">Password</Text>
