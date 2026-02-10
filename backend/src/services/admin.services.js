@@ -2,7 +2,7 @@ import db from "../config/database.js";
 
 
 export const showUsers = async () => {
-	const sql = "SELECT `id`, `username` FROM `users`";
+	const sql = "SELECT `id`, `username`, `role` FROM `users`";
 
 	const [result] = await db.query(sql);
 
