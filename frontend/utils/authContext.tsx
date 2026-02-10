@@ -6,7 +6,7 @@ import { store } from "expo-router/build/global-state/router-store";
 type AuthState = {
     isLoggedIn: boolean,
     isReady: boolean,
-    logIn: () => void,
+    logIn: (role: string) => void,
     logOut: () => void;
 };
 
@@ -25,7 +25,7 @@ export function AuthProvider({ children }: PropsWithChildren){
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
 
-    const storeAuthState = async (newState: { isLoggedIn: Boolean }) => {
+    const storeAuthState = async (newState: { isLoggedIn: boolean, role?: string }) => {
         try {
             const jsonValue = JSON.stringify(newState);
             await AsyncStorage.setItem(authStorageKey, jsonValue);
@@ -34,10 +34,14 @@ export function AuthProvider({ children }: PropsWithChildren){
         }
     };
 
-    const logIn = () => {
+    const logIn = (role: string) => {
         setIsLoggedIn(true);
-        storeAuthState({ isLoggedIn: true });
-        router.replace("/(user)/(drawer)/home");
+        storeAuthState({ isLoggedIn: true, role });
+		if (role === "admin") {
+			router.replace("/(admin)/(stack)/home");
+		} else {
+			router.replace("/(user)/(drawer)/home");
+		}
     }
     const logOut = () => {
         setIsLoggedIn(false);

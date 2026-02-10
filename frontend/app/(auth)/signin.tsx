@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useAuth } from "../../utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -41,7 +41,7 @@ export default function SignIn() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
-					logIn();
+					logIn(data.role);
 				} else {
 					setError(data.message);
 				}
@@ -60,7 +60,7 @@ export default function SignIn() {
 			});
 
 			if (biometricsResult.success){
-				logIn();
+				logIn("guest"); // ito muna for now
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}
