@@ -17,7 +17,8 @@
         "foregroundImage": "./assets/images/Isda-iconS.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.anonymous.frontend"
     },
     "web": {
       "bundler": "metro",

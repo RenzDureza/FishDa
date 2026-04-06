@@ -101,7 +101,10 @@ export default function SignUp() {
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
 					</View>
 
-					{emailError ? <Text className="text-red-600">{emailError}</Text> : null }
+					{/* {emailError ? <Text className="text-red-600">{emailError}</Text> : null } */}
+					{emailError.length > 0 && emailError.map((err, idx) => (
+    					<Text key={idx} className="text-red-600 mx-2">{err}</Text>
+					))}
 
 					<View className="mt-4">
 						<Text className="font-semibold">Username</Text>
@@ -181,7 +184,7 @@ export default function SignUp() {
 					</View>
 
 					<Text className="text-[#0B1D51] text-center mt-4">
-						Already have an account?
+						{"Already have an account?"}{' '}
 						<Link href="/signin" asChild>
 							<Text className="text-cyan-500 underline px-1">
 								Sign In!

@@ -33,8 +33,8 @@ export default function SignIn() {
 
 				const data = await res.json();
 
-				if (res.ok && data.status === "Success") {
-					setSuccess("Login Successfull");
+				if (res.ok && data.status === "success") {
+					setSuccess("Login Successful");
 					logIn(data.role);
 				} else {
 					setError(data.message || "Invalid Credentials");
@@ -72,8 +72,8 @@ export default function SignIn() {
 					{success ? <Text className="text-green-700 mx-4">{success}</Text> : null }
 					{error ? <Text className="text-red-600 mx-4">{error}</Text> : null }
 
-					<View className="mt-1">
-						<Text className="">Email</Text>
+					<View className="mt-4">
+						<Text className="font-semibold">Email</Text>
 						<TextInput
 							value={email} //remove quotation and comment
 							onChangeText={setEmail}
@@ -89,7 +89,7 @@ export default function SignIn() {
 					))}
 
 					<View className="mt-4">
-						<Text className="">Password</Text>
+						<Text className="font-semibold">Password</Text>
 						<TextInput
 							value={password} //remove quotation and comment
 							onChangeText={setPassword}

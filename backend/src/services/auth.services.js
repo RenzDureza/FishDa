@@ -46,7 +46,7 @@ export const login = async ({ email, password }) => {
 	const [result] = await db.query(sql, [email]);
 
 	return {
-		status: "Success",
+		status: "success",
 		message: "User Logged In Successfully",
 		userID: result[0].id,
 		username: result[0].username,
