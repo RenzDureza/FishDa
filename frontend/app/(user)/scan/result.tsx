@@ -4,8 +4,8 @@ import { router, useGlobalSearchParams } from 'expo-router'
 import HeaderBar from '@/components/HeaderBar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export default function viewImage () {
-    const { uri, metadata } = useGlobalSearchParams<{ uri: string; metadata: string}>();
+export default function ViewImage () {
+    const { uri, uri2, metadata } = useGlobalSearchParams<{ uri: string; uri2?: string; metadata: string}>();
     const parsedMetadata = metadata ? JSON.parse(metadata) : null;
     const insets = useSafeAreaInsets();
     const score = Math.floor(Math.random() * 100);
@@ -16,20 +16,26 @@ export default function viewImage () {
             </SafeAreaView>
 
             {uri && (
+                <View style={{ flex: 1, flexDirection: uri2 ? 'row' : 'column', alignItems: 'center', paddingHorizontal: 12 }}>
                 <View style={{flex: 1 , alignItems: "center"}}>
-                    <Image
-                    source={{ uri }}
-                    style={{ width: '70%', aspectRatio: 1}}
-                    resizeMode="contain"
-                    />
-                </View> 
+                    <Text className='text-sm font-semibold mb-1'>Whole Fish</Text>
+                    <Image source={{ uri }} style={{ width: '100%', aspectRatio: 1}} resizeMode="contain"/>
+                </View>
+
+                {uri2 && (
+                    <View style={{ flex: 1, alignItems: 'center' }}>
+                    <Text className='text-sm font-semibold mb-1'>Gills</Text>
+                    <Image source={{ uri: uri2 }} style={{ width: '100%', aspectRatio: 1 }} resizeMode="contain"/>
+                    </View>
+                )}
+                </View>
             )}
 
             <View className='flex-1 bg-primary justify-center items-center max-h-24'>
                 <Text className='text-3xl font-extrabold'>Surface Quality Score:</Text>
                 <Text className='text-3xl font-extrabold'>{score}</Text>
             </View>
-            
+
             {parsedMetadata && (
                 <ScrollView className="flex-1 w-10/12 rounded-xl bg-secondary py-2 px-6 mb-2 overflow-hidden border-2 border-tertiary"
                         contentContainerStyle={{paddingBottom: insets.bottom + 16}}>
@@ -44,7 +50,7 @@ export default function viewImage () {
 
             <SafeAreaView edges={['bottom']} className="w-full py-2 pb-2">
                 <View className={'flex-row items-center justify-end px-4'}>
-                    
+
                     <TouchableOpacity onPress={() => router.push('/home')} style={styles.button}>
                         <Text>Back to Sea</Text>
                     </TouchableOpacity>
@@ -56,12 +62,12 @@ export default function viewImage () {
                     <TouchableOpacity onPress={() => {}} style={styles.button}>
                         <Text>Send Feedback</Text>
                     </TouchableOpacity>
-                 
+
                 </View>
             </SafeAreaView>
 
             <HeaderBar onPress={() => router.back()} title='Fish' />
-            
+
         </SafeAreaView>
     )
 }
