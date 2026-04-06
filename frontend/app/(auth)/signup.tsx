@@ -22,46 +22,42 @@ export default function SignUp() {
 
 	//Error texts per input
 	const [emailError, setEmailError] = useState<string[]>([]);
-	const [passwordError, setPasswordError] = useState<string[]>([]); 
+	const [passwordError, setPasswordError] = useState<string[]>([]);
 	const [usernameError, setUsernameError] = useState<string[]>([])
 	const [confPasswordError, setConfPasswordError] = useState<boolean>();
-		
 	const { logIn } = useAuth();
 	const registerURL = process.env.EXPO_PUBLIC_REGISTER as string;
 
 	const registerUser = async () => {
 		setSuccess('');
 		setError('');
-		console.log("e: ", sanitizeEmail(email), "u: ", sanitizeUsername(username), "p: ", sanitizePassword(password));
+
+		if (!email || !username || !password) return setError('All Fields Required');
+		if (emailError.length > 0) return setError("Invalid Email");
+		if (usernameError.length > 0) return setError("Invalid Username");
+		if (passwordError.length > 0) return setError("Invalid Password");
+		if (confPasswordError) return setError("Passwords do not mactch");
 
 		try {
-			if (!email || !username || !password) setError("All fields required.");
-			else if ((emailError.length === 0) && (usernameError.length === 0) && (passwordError.length === 0) && !confPasswordError){
-				console.log("Complete.")
 				const res = await fetch(registerURL, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ username, email, password }),
+					body: JSON.stringify({
+						username: sanitizeUsername(username),
+						email: sanitizeEmail(email),
+						password: sanitizePassword(password) }),
 				});
 
 				const data = await res.json();
 
 				if (res.ok && data.status === "success") {
-					setSuccess("Success" + data.message);
-					logIn();
+					setSuccess("Registered Successfully!");
+					logIn(data.role);
 				} else {
-					setError(data.message);
+					setError(data.message || "Registration Failed");
 				}
-			} else {
-				if (!(emailError.length === 0)) setError("Invalid email.");
-				else if (!(usernameError.length === 0)) setError("Invalid username.");
-				else if (!(passwordError.length === 0)) setError("Invalid password.");
-				else setError ("Error");
-			}
 		} catch (err) {
-			setError ("Error hi" + String(err));
-			Alert.alert("Error hi", String(err));
-			console.log("Error: ", String(err));
+			setError ("Network Error " + String(err));
 		}
 	}
 
@@ -71,7 +67,7 @@ export default function SignUp() {
 				promptMessage: 'Login via Authentication'
 			});
 			if (biometricsResult.success){
-				logIn();
+				logIn("guest");
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}
@@ -93,10 +89,10 @@ export default function SignUp() {
 					{success ? <Text className="text-green-700 mx-4">{success}</Text> : null }
 					{error ? <Text className="text-red-600 mx-4">{error}</Text> : null }
 
-					<View className="">
+					<View className="mt-4">
 						<Text className="font-semibold">Email</Text>
 						<TextInput
-							value={email} //remove quotation and comment
+							value={email}
 							onChangeText={setEmail}
 							onBlur={() => setEmailError(validateEmail(sanitizeEmail(email)))}
 							placeholder="JuanDelaCruz@email.com"
@@ -105,12 +101,12 @@ export default function SignUp() {
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
 					</View>
 
-					{emailError ? <Text className="text-red-600 mx-2">{emailError}</Text> : null }
+					{emailError ? <Text className="text-red-600">{emailError}</Text> : null }
 
-					<View className="mx-2">
+					<View className="mt-4">
 						<Text className="font-semibold">Username</Text>
 						<TextInput
-							value={username} //remove quotation and comment
+							value={username}
 							onChangeText={setUsername}
 							onBlur={() => setUsernameError(validateUsername(username))}
 							placeholder="Juan Dela Cruz"
@@ -120,15 +116,15 @@ export default function SignUp() {
 					</View>
 
 					{usernameError.length > 0 && usernameError.map((err, idx) => (
-						<Text key={idx} className="text-red-600 text-center mx-2">
+						<Text key={idx} className="text-red-600 text-center">
 							{err}
 						</Text>
 					))}
 
-					<View className="mx-2">
+					<View className="mt-4">
 						<Text className="font-semibold">Password</Text>
 						<TextInput
-							value={password} //remove quotation and comment
+							value={password}
 							onChangeText={setPassword}
 							onBlur={() => setPasswordError(validatePassword(sanitizePassword(password)))}
 							placeholder="***************"
@@ -142,7 +138,7 @@ export default function SignUp() {
 						</Text>
 					))}
 
-					<View className="mx-2">
+					<View className="mt-4">
 						<Text className="font-semibold">Confirm Password</Text>
 						<TextInput
 							value={confPassword}

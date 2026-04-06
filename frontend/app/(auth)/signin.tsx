@@ -23,12 +23,9 @@ export default function SignIn() {
 	const loginUser = async () => {
 		setSuccess('');
 		setError('');
+
 		try {
-			if(!email || !password) setError('All fields required');
-			else if(!(emailError.length === 0)) setError('Invalid email.');
-			else {
-				console.log('Valid email');
-				const res = await fetch(loginURL, {
+			const res = await fetch(loginURL, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ email, password }),
@@ -36,20 +33,14 @@ export default function SignIn() {
 
 				const data = await res.json();
 
-				if(email != data.exist) setError('Email does not exist.');
-				if(password != data.correctPassword) setError('Invalid password.');
-
-				if (res.ok && data.status === "success") {
-					setSuccess("Success" + data.message);
+				if (res.ok && data.status === "Success") {
+					setSuccess("Login Successfull");
 					logIn(data.role);
 				} else {
-					setError(data.message);
+					setError(data.message || "Invalid Credentials");
 				}
-			}
 		} catch (err) {
-			setError("Error:" + String(err));
-			Alert.alert("Error:", String(err));
-			console.log("Error:" + String(err));
+			setError("Network Error. Please Try Again " + String(err));
 		}
 	}
 
@@ -93,7 +84,9 @@ export default function SignIn() {
 							className="bg-white w-80 rounded-lg border border-gray-500 px-2 py-1" />
 					</View>
 
-					{emailError ? <Text className="text-red-600 mx-2">{emailError}</Text> : null }
+					{emailError.length > 0 && emailError.map((err, idx) => (
+    					<Text key={idx} className="text-red-600 mx-2">{err}</Text>
+					))}
 
 					<View className="mt-4">
 						<Text className="">Password</Text>
