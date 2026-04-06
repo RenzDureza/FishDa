@@ -1,30 +1,41 @@
-import { Stack, useRouter } from "expo-router";
+import { Redirect, Stack, useRouter } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native";
+import { useAuth } from "../../../utils/authContext";
 
 export default function AdminLayout() {
-  return (
-    <SafeAreaProvider>
-        <Stack
-        screenOptions={{
-          headerShown: false,
-          headerStyle:{
-            backgroundColor: "#FFE3A9",
-          },
-          headerShadowVisible: false,
-          headerTitleAlign: "center",
-          }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="manage"
-              options={{
-              headerShown: true,
-              title: "Manage Users",
-              headerLeft: () => <BackButton />
-              }}/>
-        </Stack>
-    </SafeAreaProvider>
-  );
+  const { isLoggedIn, isReady } = useAuth();
+  
+    if(!isReady) {
+      return null;
+    }
+  
+    if(!isLoggedIn){
+      return <Redirect href="/(auth)/signin" />
+    }
+
+    return (
+      <SafeAreaProvider>
+          <Stack
+          screenOptions={{
+            headerShown: false,
+            headerStyle:{
+              backgroundColor: "#FFE3A9",
+            },
+            headerShadowVisible: false,
+            headerTitleAlign: "center",
+            }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="manage"
+                options={{
+                headerShown: true,
+                title: "Manage Users",
+                headerLeft: () => <BackButton />
+                }}/>
+          </Stack>
+      </SafeAreaProvider>
+    );
 }
 
 function BackButton() {
