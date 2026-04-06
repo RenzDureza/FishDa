@@ -40,7 +40,7 @@ export default function SignIn() {
 					setError(data.message || "Invalid Credentials");
 				}
 		} catch (err) {
-			setError("Network Error. Please Try Again");
+			setError("Network Error. Please Try Again " + String(err));
 		}
 	}
 

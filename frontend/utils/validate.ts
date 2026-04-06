@@ -4,12 +4,12 @@
 export const validateEmail = (email: string): string [] => {
     const errors: string[] = [];
     if(!email){
-        errors.push("Email is required.");
+        errors.push("Email is required");
         return errors;
     }
     const regex = /^[a-zA-Z0-9?/]+\.?[a-zA-Z0-9]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com|feu\.edu\.ph|fit\.edu\.ph)$/;
     if(!regex.test(email)){
-        errors.push("Invalid email address.");
+        errors.push("Invalid email address");
         return errors;
     }
     return errors;
@@ -38,8 +38,8 @@ export const validatePassword = (password: string): string [] => {
     }
     if(!/[A-Z]/.test(password)) errors.push("Must contain at least 1 Uppercase Letter.");
     if(!/[a-z]/.test(password)) errors.push("Must contain at least 1 Lowercase Letter.");
-    if(!/[0-9]/.test(password)) errors.push("Must contain at least 1 Numebr.");
-    if(!/[!@#$%^&*]/.test(password)) errors.push("Must contain at least 1 Special Character ! @ # $ % ^ & *");
+    if(!/[0-9]/.test(password)) errors.push("Must contain at least 1 Number.");
+    if(!/[!@#$%^&*]/.test(password)) errors.push("Must contain at least 1 Special Character");
     if(password.length < 8) errors.push("Password must be at least 8 characters.");
     // const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/i;
     // return regex.test(password);

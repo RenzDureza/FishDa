@@ -20,7 +20,7 @@ export const register = async ({ username, email, password }) => {
 
 	return {
 		status: "success",
-		message: "User Registered Successfully",
+		message: "User Registered Successfully!",
 		userID: result.insertId
 	};
 };
@@ -46,7 +46,7 @@ export const login = async ({ email, password }) => {
 	const [result] = await db.query(sql, [email]);
 
 	return {
-		status: "success",
+		status: "Success",
 		message: "User Logged In Successfully",
 		userID: result[0].id,
 		username: result[0].username,
