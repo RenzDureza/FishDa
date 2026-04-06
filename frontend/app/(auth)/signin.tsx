@@ -36,8 +36,8 @@ export default function SignIn() {
 
 				const data = await res.json();
 
-				if(email != data.exist) setError('Email does not exist.');
-				if(password != data.correctPassword) setError('Invalid password.');
+				if(email !== data.exist) setError('Email does not exist.');
+				if(password !== data.correctPassword) setError('Invalid password.');
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Success" + data.message);
