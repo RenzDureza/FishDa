@@ -24,6 +24,8 @@ export default function SignIn() {
 		setSuccess('');
 		setError('');
 
+		if (!email || !password) return setError('All Fields Required');
+
 		try {
 			const res = await fetch(loginURL, {
 					method: "POST",
@@ -37,7 +39,7 @@ export default function SignIn() {
 					setSuccess("Login Successful");
 					logIn(data.role);
 				} else {
-					setError(data.message || "Invalid Credentials");
+					setError(data.message || "Invalid Email or Password");
 				}
 		} catch (err) {
 			setError("Network Error. Please Try Again " + String(err));

@@ -1,7 +1,15 @@
 import * as authService from "../services/auth.services.js";
+import { validate } from "../utils/validate.js";
 
 export const register = async (req, res) => {
 	const { username, email, password } = req.body;
+
+	const errors = validate({ username, email, password }, ['username', 'email', 'password']);
+	if(Object.keys(errors).length > 0){
+		return res.status(422).json({
+			status: "error", errors
+		});
+	}
 
 	try {
 		const userID = await authService.register({
@@ -24,6 +32,14 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
 	const { email, password } = req.body;
+
+	const errors = validate({ email, password }, ['email', 'password']);
+	if(Object.keys(errors).length > 0){
+		return res.status(422).json({
+			status: "error", errors
+		});
+	}
+
 	try {
 		const userID = await authService.login({
 			email,

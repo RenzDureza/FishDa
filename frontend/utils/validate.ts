@@ -23,7 +23,7 @@ export const validateUsername = (username: string): string [] => {
         errors.push("Username is required.");
         return errors;
     }
-    if(!regex.test(username)) errors.push("Username can only contain letters, numbers, underscore, and dots")
+    if(!regex.test(username)) errors.push("Username can only contain letters, numbers, underscores, and dots")
     if(username.length < 3) errors.push("Username must be at least 3 characters.");
     if(username.length > 16) errors.push("Username must not exceed 16 characters.");
     return errors;
