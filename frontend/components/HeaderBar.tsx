@@ -17,7 +17,7 @@ type HeaderBarProps = {
 export default function HeaderBar({
     onPress,
     size = 40,
-    color = 'black',
+    color = 'white',
     style = {},
     title,
     titleColor = 'bg-tertiary',
@@ -26,11 +26,11 @@ export default function HeaderBar({
 }: HeaderBarProps) {
     const insets = useSafeAreaInsets();
     return(
-        <SafeAreaView edges={['top']} className="absolute top-0 w-full">
-            <View className={`flex-row items-center ${title ? 'justify-between' : 'justify-start'} px-4`} style={{ paddingTop: insets.top, height: 70}}>
-                
+        <SafeAreaView edges={['top']} className="absolute w-full">
+            <View className={`flex-row items-center ${title ? 'justify-between' : 'justify-start'} px-4`} style={{ height: 70}}>
+
                 <TouchableOpacity onPress={onPress} style={style}>
-                    <Ionicons name="arrow-back-outline" size={size} color={color} /> 
+                    <Ionicons name="arrow-back-outline" size={size} color={color} />
                 </TouchableOpacity>
 
                 {title && (
@@ -43,7 +43,7 @@ export default function HeaderBar({
                     </View>
                 )}
 
-                {title && <View style={{ width: size}}/>}                   
+                {title && <View style={{ width: size}}/>}
             </View>
         </SafeAreaView>
     );
