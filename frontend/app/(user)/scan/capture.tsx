@@ -1,11 +1,12 @@
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
-import { SafeAreaProvider, SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
+import { View, Text, TouchableOpacity, Alert, Dimensions, StyleSheet} from 'react-native'
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useCameraPermissions, CameraView, CameraType } from "expo-camera";
 import { useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import  BackButton  from '@/components/HeaderBar';
 import { router } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
+import Svg, { Defs, Mask, Rect, Circle} from 'react-native-svg';
 
 export default function Capture(){
     const [imageUri, setImageUri] = useState<string | null>(null);
@@ -15,6 +16,18 @@ export default function Capture(){
     const [permission, requestPermission] = useCameraPermissions();
     const cameraRef = useRef<CameraView>(null);
     const insets = useSafeAreaInsets();
+    const {width: screenWidth, height: screenHeight} = Dimensions.get('window');
+
+    // Fish Box Dimensions
+    const BOX_WIDTH = screenWidth * 0.6;
+    const BOX_HEIGHT = screenHeight * 0.66;
+    const BOX_X = screenWidth * 0.2;
+    const BOX_Y = (screenHeight - BOX_HEIGHT) / 2;
+
+    // Gills Dimensions
+    const CIRCLE_RADIUS = 120;
+    const CIRCLE_CX = screenWidth / 2;
+    const CIRCLE_CY = screenHeight / 2;
 
     if (!permission){
         return (
@@ -91,24 +104,122 @@ export default function Capture(){
     }
 
     return(
-        <View className="flex-1 bg-primary">
-            <View className='absolute bg-primary w-full top-0 min-h-12'>
-            </View>
-
+        <View className="flex-1">
             {/* Camera */}
-            <CameraView ref={cameraRef} style={{ flex: 1 }} facing={facing}/>
+            <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing}/>
 
-            {/* Step Indicator */}
-            <View className="absolute top-16 w-full items-center z-10">
-                <Text className="text-white text-lg font-bold bg-black/50 px-4 py-2 rounded-full">
-                    {firstUri ? 'Capture Gills (Recommended)' : 'Capture Fish Body'}
-                </Text>
+            {/* Overlay */}
+           {!firstUri ? (
+
+            <View style={StyleSheet.absoluteFill} pointerEvents='none'>
+                <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+                    <Defs>
+                        <Mask id="fishMask">
+                            <Rect width="100%" height="100%" fill="white"/>
+                            <Rect
+                                x= {BOX_X}
+                                y= {BOX_Y}
+                                width={BOX_WIDTH}
+                                height={BOX_HEIGHT}
+                                rx = "12"
+                                fill = "black"
+                            />
+                        </Mask>
+                    </Defs>
+                        <Rect
+                        width="100%"
+                        height="100%"
+                        fill="rgba(0,0,0,0.55)"
+                        mask="url(#fishMask)"
+                        />
+                </Svg>
+
+                <View style={{
+                    position: "absolute",
+                    left: BOX_X,
+                    top: BOX_Y,
+                    width: BOX_WIDTH,
+                    height: BOX_HEIGHT,
+                    borderWidth: 2,
+                    borderColor: "white",
+                    borderRadius: 12,
+                }}>
+
+                </View>
+
             </View>
 
-            {/* Top Bar */}
-            <BackButton onPress={() => router.push('/home')}/>
+           ) : (
 
-            {firstUri && ( //Retake Option (appears after capture)
+            <View style={StyleSheet.absoluteFill} pointerEvents='none'>
+                <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+                    <Defs>
+                        <Mask id="gillsMask">
+                            <Rect width="100%" height="100%" fill="white"/>
+                            <Circle
+                                cx = {CIRCLE_CX}
+                                cy = {CIRCLE_CY}
+                                r = {CIRCLE_RADIUS}
+                                fill = "black"
+                            />
+                        </Mask>
+                    </Defs>
+                        <Rect
+                        width="100%"
+                        height="100%"
+                        fill="rgba(0,0,0,0.55)"
+                        mask="url(#gillsMask)"
+                        />
+                </Svg>
+
+                <View style={{
+                    position: "absolute",
+                    left: CIRCLE_CX - CIRCLE_RADIUS,
+                    top: CIRCLE_CY - CIRCLE_RADIUS,
+                    width: CIRCLE_RADIUS * 2,
+                    height: CIRCLE_RADIUS * 2,
+                    borderWidth: 2,
+                    borderColor: "white",
+                    borderRadius: CIRCLE_RADIUS,
+                }}>
+
+                </View>
+            </View>
+
+           )}
+
+           <View style={{ flex: 1, justifyContent: 'space-between' }}>
+                {/* Top Bar */}
+                <SafeAreaView>
+                    <View className="absolute top-12 w-full items-center z-10">
+                        <Text className="text-white text-lg font-bold bg-black/50 px-4 py-4 rounded-full">
+                            {firstUri ? 'Capture Gills (Recommended)' : 'Capture Fish Body'}
+                        </Text>
+                    </View>
+                </SafeAreaView>
+
+                {/* Bottom Area */}
+                <SafeAreaView>
+                    <View className="absolute w-full flex-row items-center justify-between px-12 py-6 pt-4"
+                        style={{ bottom: insets.bottom}}>
+
+                        <TouchableOpacity onPress={pickImage}>
+                            <Ionicons name="images-outline" size={51} color="white" />
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                        onPress={captureImage}
+                        className='h-14 w-14 rounded-full bg-white py-6'/>
+
+                        <TouchableOpacity onPress={toggleCameraFacing}>
+                            <Ionicons name="camera-reverse-outline" size={51} color="white" />
+                        </TouchableOpacity>
+                    </View>
+                </SafeAreaView>
+            </View>
+
+            {/* Post Body Capture */}
+            {firstUri && (
                 <TouchableOpacity
                     onPress={() => setFirstUri(null)}
                     className="absolute top-28 right-4 z-10 bg-red-500 px-3 py-1 rounded-full">
@@ -117,7 +228,7 @@ export default function Capture(){
             )}
 
             {firstUri && (
-                <TouchableOpacity //Skip Button (appears after capture)
+                <TouchableOpacity
                     onPress={() => router.push({
                         pathname: '/scan/result',
                         params: { uri: firstUri, metadata: JSON.stringify({}) },
@@ -127,31 +238,8 @@ export default function Capture(){
                 </TouchableOpacity>
             )}
 
-            {/* Bottom Icons */}
-            <SafeAreaView>
-            <View className="bg-primary absolute w-full flex-row items-center justify-between px-12 pt-4"
-            style={{ bottom: insets.bottom}}>
-
-                {/* Image Picker */}
-                <TouchableOpacity onPress={pickImage} className=''>
-                    <Ionicons name="images-outline" size={51} color="black" />
-                </TouchableOpacity>
-
-                {/* Capture Image */}
-                <TouchableOpacity
-                onPress={captureImage}
-                className='h-20 w-20 rounded-full bg-white border-4 border-black'
-                />
-
-                {/* Flip Camera */}
-                <TouchableOpacity onPress={toggleCameraFacing}>
-                    <Ionicons name="camera-reverse-outline" size={51} color="black" />
-                </TouchableOpacity>
-
-            </View>
-            </SafeAreaView>
+            <BackButton onPress={() => router.push('/home')}/>
 
         </View>
     );
 }
-
