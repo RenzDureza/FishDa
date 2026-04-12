@@ -9,6 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { sanitizeEmail } from "@/utils/sanitize";
 import { validateEmail } from "@/utils/validate";
+import { apiFetch, API_BASE} from "@/utils/api";
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
@@ -17,7 +18,7 @@ export default function SignIn() {
 	const [error, setError] = useState("");
 	const [emailError, setEmailError] = useState<string[]>([]);
 
-	const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
+	//const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
 	const { logIn } = useAuth();
 
 	const loginUser = async () => {
@@ -27,7 +28,7 @@ export default function SignIn() {
 		if (!email || !password) return setError('All Fields Required');
 
 		try {
-			const res = await fetch(loginURL, {
+			const res = await apiFetch("/login", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ email, password }),
@@ -37,7 +38,7 @@ export default function SignIn() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Login Successful");
-					logIn(data.role);
+					await logIn(data.token);
 				} else {
 					setError(data.message || "Invalid Email or Password");
 				}

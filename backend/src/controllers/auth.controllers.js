@@ -1,5 +1,6 @@
 import * as authService from "../services/auth.services.js";
 import { validate } from "../utils/validate.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res) => {
 	const { username, email, password } = req.body;
@@ -18,10 +19,19 @@ export const register = async (req, res) => {
 			password
 		});
 
+		const token = jwt.sign({
+			id: userID.userID,
+			username: userID.username,
+			role: userID.role,
+		},
+			process.env.JWT_SECRET,
+			{ expiresIn: '7d' }
+		);
+
 		res.status(201).json({
 			status: "success",
 			message: "User Created",
-			id: userID
+			token
 		});
 	} catch (err) {
 		res.status(500).json({
@@ -46,15 +56,22 @@ export const login = async (req, res) => {
 			password
 		});
 
+		const token = jwt.sign({
+			id: userID.userID,
+			username: userID.username,
+			role: userID.role,
+		},
+			process.env.JWT_SECRET,
+			{ expiresIn: '7d' }
+		);
+
 		res.status(200).json({
 			status: "success",
 			message: "Login successful",
-			id: userID.userID,
-			username: userID.username,
-			role: userID.role
+			token
 		});
 	} catch (err) {
-		res.status(500).json({
+		res.status(err.status ?? 500).json({
 			message: err.message
 		});
 	}
