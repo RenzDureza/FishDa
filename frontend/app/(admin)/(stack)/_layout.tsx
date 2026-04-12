@@ -5,7 +5,7 @@ import { TouchableOpacity } from "react-native";
 import { useAuth } from "../../../utils/authContext";
 
 export default function AdminLayout() {
-  const { isLoggedIn, isReady } = useAuth();
+  const { isLoggedIn, isReady, role } = useAuth();
   
     if(!isReady) {
       return null;
@@ -13,6 +13,10 @@ export default function AdminLayout() {
   
     if(!isLoggedIn){
       return <Redirect href="/(auth)/signin" />
+    }
+
+    if(role !== "admin"){
+      return <Redirect href="/(user)/(drawer)/home" />
     }
 
     return (

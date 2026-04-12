@@ -1,77 +1,108 @@
 import { createContext, PropsWithChildren, useState, useContext, useEffect } from "react";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+//import * as SecureStore from "expo-secure-store";
+import { storage } from "./storage";
+import { jwtDecode } from "jwt-decode";
 
 type AuthState = {
     isLoggedIn: boolean,
     isReady: boolean,
     role: string | null,
-    logIn: (role: string) => void,
-    logOut: () => void;
+    username: string | null,
+    logIn: (token: string) => Promise<void>;
+    logOut: () => Promise<void>;
 };
 
-const authStorageKey = "auth-key";
+type JWTPayload = {
+    userID: number;
+    username: string;
+    role: string;
+    expire: number;
+}
 
-// export const AuthContext = createContext<AuthState | undefined>(undefined);
+const TOKEN_KEY = "token-key";
+
+//SecureStore is for only working on mobile. If including web version, use storage.
+//export const getStoredToken = () => SecureStore.getItemAsync(TOKEN_KEY);
+export const getStoredToken = () => storage.getItem(TOKEN_KEY);
+
 export const AuthContext = createContext<AuthState>({
     isLoggedIn: false,
     isReady: false,
     role: null,
-    logIn: () => {},
-    logOut: () => {},
+    username: null,
+    logIn: async () => {},
+    logOut: async () => {},
 });
 
 export function AuthProvider({ children }: PropsWithChildren){
     const [isReady, setIsReady] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [role, setRole] = useState<string | null>(null);
+    const [username, setUsername] = useState<string | null>(null);
     const router = useRouter();
 
-    const storeAuthState = async (newState: { isLoggedIn: boolean, role?: string }) => {
-        try {
-            await AsyncStorage.setItem(authStorageKey, JSON.stringify(newState));
+    const logIn = async (token: string) => {
+        try{
+            const decoded = jwtDecode<JWTPayload>(token);
+            //await SecureStore.setItemAsync(TOKEN_KEY, token);
+            await storage.setItem(TOKEN_KEY, token);
+            setIsLoggedIn(true);
+            setRole(decoded.role);
+            setUsername(decoded.username);
+
+            if(decoded.role === "admin"){
+                router.replace("/(admin)/(stack)/adminHome");
+            } else {
+                router.replace("/(user)/(drawer)/home");
+            }
         } catch(err) {
-            console.log("Error storing auth state: ", err);
+            console.error("logIn error: ", err);
         }
     };
 
-    const logIn = (role: string) => {
-        setIsLoggedIn(true);
-        setRole(role);
-        storeAuthState({ isLoggedIn: true, role });
-		if (role === "admin") {
-			router.replace("/(admin)/(stack)/home");
-		} else {
-			router.replace("/(user)/(drawer)/home");
-		}
-    };
-
-    const logOut = () => {
+    const logOut = async () => {
+        try{
+            //await SecureStore.deleteItemAsync(TOKEN_KEY);
+            await storage.deleteItem(TOKEN_KEY);
+        } catch(err){
+            console.error("logOut error: ", err);
+        }
         setIsLoggedIn(false);
         setRole(null);
-        storeAuthState({ isLoggedIn: false });
+        setUsername(null);
         router.replace("/(auth)/signin");
     }
 
     useEffect(() => {
-        const getAuthFromStorage = async () => {
+        const restoreSession = async () => {
             try {
-                const val = await AsyncStorage.getItem(authStorageKey);
-                if(val !== null) {
-                    const auth = JSON.parse(val);
-                    setIsLoggedIn(auth.isLoggedIn);
-                    setRole(auth.role ?? null);
+                //const token = await SecureStore.getItemAsync(TOKEN_KEY);
+                const token = await storage.getItem(TOKEN_KEY);
+
+                if(token) {
+                    const decoded = jwtDecode<JWTPayload>(token);
+                    const isExpired = decoded.expire * 1000 < Date.now();
+
+                    if(!isExpired){
+                        setIsLoggedIn(true);
+                        setRole(decoded.role);
+                        setUsername(decoded.username);
+                    } else {
+                        //await SecureStore.deleteItemAsync(TOKEN_KEY);
+                        await storage.deleteItem(TOKEN_KEY);
+                    }
                 }
             } catch(err) {
-                console.log("Error fetch from storage: ", err);
+                console.error("restoreSession error: ", err);
             }
             setIsReady(true);
         };
-        getAuthFromStorage();
+        restoreSession();
     }, []);
 
     return(
-        <AuthContext.Provider value={{ isLoggedIn, isReady, role, logIn, logOut }}>
+        <AuthContext.Provider value={{ isLoggedIn, isReady, role, username, logIn, logOut }}>
             {children}
         </AuthContext.Provider>
     )
