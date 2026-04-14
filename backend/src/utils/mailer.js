@@ -1,4 +1,8 @@
-const nodemailer = require('nodemailer');
+import nodemailer from "nodemailer";
+import "dotenv/config";
+
+console.log("EMAIL_USER:", process.env.EMAIL_USER);
+console.log("EMAIL_PASS:", process.env.EMAIL_PASS);
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -8,7 +12,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const sendVerificationEmail = async (toEmail, verificationLink) => {
+export const sendVerificationEmail = async (toEmail, verificationLink) => {
   await transporter.sendMail({
     from: `"IsdaOK" <${process.env.EMAIL_USER}>`,
     to: toEmail,
@@ -21,5 +25,3 @@ const sendVerificationEmail = async (toEmail, verificationLink) => {
     `,
   });
 };
-
-module.exports = { sendVerificationEmail };
