@@ -6,11 +6,11 @@ import { useAuth } from "@/utils/authContext";
 export default function Home() {
   const { logOut } = useAuth();
   return (
-    <View className="flex-1 space-y-4 items-center justify-center bg-primary px-4">
+    <View className="flex-auto items-center justify-center bg-primary px-4 ">
 
-      <View className="space-y-6 items-center">
+      <View className="items-center -mt-20">
 
-        <Image source={logo} className="w-32 h-32" resizeMode="contain"/>
+        <Image source={logo} className="w-32 h-32 mb-22" resizeMode="contain"/>
 
         <Text className="text-[#0B1D51] text-3xl font-semibold text-center">
           Welcome
@@ -24,7 +24,7 @@ export default function Home() {
         <Text className="text-center font-semibold text-[#0B1D51] ">History</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" // Placeholder logout
+        <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4"
             onPress={() => {
                 logOut();
             }}>

@@ -53,7 +53,6 @@ export default function SignUp() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Registered Successfully!");
-					await logIn(data.token);
 				} else {
 					setError(data.message || "Registration Failed");
 				}
