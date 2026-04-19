@@ -13,25 +13,11 @@ export const register = async (req, res) => {
 	}
 
 	try {
-		const userID = await authService.register({
-			username,
-			email,
-			password
-		});
-
-		const token = jwt.sign({
-			id: userID.userID,
-			username: userID.username,
-			role: userID.role,
-		},
-			process.env.JWT_SECRET,
-			{ expiresIn: '7d' }
-		);
+		const result = await authService.register({ username, email, password });
 
 		res.status(201).json({
 			status: "success",
 			message: "User Created",
-			token
 		});
 	} catch (err) {
 		res.status(500).json({
@@ -77,3 +63,13 @@ export const login = async (req, res) => {
 	}
 };
 
+export const verifyEmail = async (req, res) => {
+  const { token } = req.query;
+
+  try {
+    const result = await authService.verifyEmail(token);
+    res.status(200).json(result); //redirect to sign-in page somehow
+  } catch (err) {
+    res.status(400).json({ message: "Link is invalid or has expired." });
+  }
+};

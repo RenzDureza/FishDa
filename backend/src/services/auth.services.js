@@ -1,9 +1,9 @@
 import db from "../config/database.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { sendVerificationEmail } from "../utils/mailer.js";
 
 export const register = async ({ username, email, password }) => {
-	const sql = "INSERT INTO `users` (`username`, `email`, `password`) VALUES (?, ?, ?)";
-
 	if (!username || !email || !password) {
 		throw new Error("All fields are required");
 	}
@@ -16,25 +16,41 @@ export const register = async ({ username, email, password }) => {
 
 	const hashed_pass = await bcrypt.hash(password, 10);
 
-	const [result] = await db.query(sql, [username, email, hashed_pass]);
+	const verificationToken = jwt.sign(
+		{ email },
+		process.env.JWT_SECRET,
+		{ expiresIn: "24h" }
+	);
+
+	const sql = "INSERT INTO `users` (`username`, `email`, `password`, `verification_token`) VALUES (?, ?, ?, ?)";
+	const [result] = await db.query(sql, [username, email, hashed_pass, verificationToken]);
+
+	const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${verificationToken}`;
+	await sendVerificationEmail(email, verificationLink);
 
 	return {
 		status: "success",
-		message: "User Registered Successfully!",
+		message: "Registered! Please Check your email for verification.",
 		userID: result.insertId
 	};
 };
 
 export const login = async ({ email, password }) => {
-	const [records] = await db.query("SELECT `id`, `username`, `password`, `role` FROM `users` WHERE `email` = ?", [email]);
+	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, 'is_verified' FROM `users` WHERE `email` = ?", [email]);
 
 	if(!records.length){
 		throw new Error("Invalid Email or Password");
 	}
 
 	const user = records[0];
-	const isMatch = await bcrypt.compare(password, user.password);
 
+	if (!user.is_verified) {
+		const error = new Error("Please verify your email before logging in.");
+		error.status = 403;
+		throw error;
+ 	}
+
+	const isMatch = await bcrypt.compare(password, user.password);
 	if(!isMatch){
 		throw new Error("Invalid Email or Password");
 	}
@@ -48,3 +64,21 @@ export const login = async ({ email, password }) => {
 	};
 };
 
+export const verifyEmail = async (token) => {
+	const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  	const [records] = await db.query(
+    	"SELECT id, is_verified FROM users WHERE email = ?",
+    	[decoded.email]
+	);
+
+	if (!records.length) throw new Error("Invalid token");
+	if (records[0].is_verified) throw new Error("Email already verified");
+
+	await db.query(
+    	"UPDATE users SET is_verified = 1, verification_token = NULL WHERE email = ?",
+    	[decoded.email]
+	);
+
+	return { status: "success", message: "Email verified! You can now log in." };
+};
