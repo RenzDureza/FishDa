@@ -9,7 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { sanitizeEmail } from "@/utils/sanitize";
 import { validateEmail } from "@/utils/validate";
-import { apiFetch, API_BASE} from "@/utils/api";
+import { apiFetch} from "@/utils/api";
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
@@ -28,7 +28,7 @@ export default function SignIn() {
 		if (!email || !password) return setError('All Fields Required');
 
 		try {
-			const res = await apiFetch("/login", {
+			const res = await apiFetch("/api/auth/login", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({ email, password }),

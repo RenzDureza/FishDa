@@ -9,7 +9,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useAuth } from "@/utils/authContext";
 import { sanitizeEmail, sanitizePassword, sanitizeUsername } from "@/utils/sanitize";
 import { validateEmail, validatePassword, validateUsername } from "@/utils/validate";
-import { apiFetch, API_BASE } from "@/utils/api";
+import { apiFetch } from "@/utils/api";
 
 export default function SignUp() {
 	const [username, setUsername] = useState("");
@@ -40,7 +40,7 @@ export default function SignUp() {
 		if (confPasswordError) return setError("Passwords do not mactch");
 
 		try {
-				const res = await apiFetch("/register", {
+				const res = await apiFetch("/api/auth/register", {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
 					body: JSON.stringify({
