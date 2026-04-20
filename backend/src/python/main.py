@@ -191,6 +191,24 @@ def eye_clarity(eye):
     return sharpness, edge_density
 
 
+def eye_redness(eye):
+    if eye is None or eye.size == 0:
+        return 0.0
+
+    hsv = cv.cvtColor(eye, cv.COLOR_BGR2HSV)
+    h, s, v = cv.split(hsv)
+
+    valid = (v > 30) & (s > 40)
+
+    if np.sum(valid) == 0:
+        return 111
+
+    red = ((h <= 10) | (h >= 160))
+
+    redness = np.sum(red & valid) / np.sum(valid)
+    return float(redness)
+
+
 # main
 def main():
     img_path = sys.argv[1] if len(sys.argv) >= 2 else "bangus.jpg"
