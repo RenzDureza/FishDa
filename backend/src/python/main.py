@@ -209,6 +209,20 @@ def eye_redness(eye):
     return float(redness)
 
 
+# body
+def shininess_evaluation(body_roi):
+    _, s_ch, v_ch = cv.split(cv.cvtColor(body_roi, cv.COLOR_BGR2HSV))
+    body_area = body_roi.shape[0] * body_roi.shape[1]
+    v_top = np.percentile(v_ch, 85)
+    s_low = np.percentile(s_ch, 30)
+    specular_mask = ((v_ch > v_top) & (s_ch < s_low)).astype(np.uint8) * 255
+
+    specular_coverage = cv.countNonZero(specular_mask) / body_area
+    specular_average = np.mean(v_ch[specular_mask > 0])
+
+    return specular_coverage, specular_average
+
+
 # main
 def main():
     img_path = sys.argv[1] if len(sys.argv) >= 2 else "bangus.jpg"
