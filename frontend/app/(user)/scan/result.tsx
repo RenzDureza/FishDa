@@ -5,8 +5,8 @@ import HeaderBar from '@/components/HeaderBar';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function ViewImage () {
-    const { uri, uri2, metadata } = useGlobalSearchParams<{ uri: string; uri2?: string; metadata: string}>();
-    const parsedMetadata = metadata ? JSON.parse(metadata) : null;
+    const { result, uri, uri2 } = useGlobalSearchParams<{ result: string; uri: string; uri2?: string}>();
+    const parsedResult = result ? JSON.parse(result) : null;
     const insets = useSafeAreaInsets();
     const score = Math.floor(Math.random() * 100);
 
@@ -36,11 +36,11 @@ export default function ViewImage () {
                 <Text className='text-3xl font-extrabold'>{score}</Text>
             </View>
 
-            {parsedMetadata && (
+            {parsedResult && (
                 <ScrollView className="flex-1 w-10/12 rounded-xl bg-secondary py-2 px-6 mb-2 overflow-hidden border-2 border-tertiary"
                         contentContainerStyle={{paddingBottom: insets.bottom + 16}}>
-                    <Text className='mb-2 font-semibold'>Metadata:</Text>
-                {Object.entries(parsedMetadata).map(([key, value]) => (
+                    <Text className='mb-2 font-semibold'>Result:</Text>
+                {Object.entries(parsedResult).map(([key, value]) => (
                     <Text key={key} className='text-black mb-2'>
                         {key}: {value?.toString()}
                     </Text>
