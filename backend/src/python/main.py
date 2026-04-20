@@ -3,7 +3,7 @@ import numpy as np
 import os
 import sys
 
-
+# for debugging
 def save(name, img, dir="eye_debug"):
     os.makedirs(dir, exist_ok=True)
     if img is None or img.size == 0:
@@ -70,42 +70,31 @@ def segment_fish(img):
     return combined, fish_contour, fx, fy, fw, fh
 
 
+def preprocess(roi_bgr):
+    gray = cv.cvtColor(roi_bgr, cv.COLOR_BGR2GRAY)
+    clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(4, 4))
+    return clahe.apply(gray)
+
+
 # split fish region
 def get_fish_region_coords(fx, fy, fw, fh):
     eye_end = fy + int(0.25 * fh)
-    body_end = fy + int(0.65 * fh)
+    body_end = fy + int(0.80 * fh)
     tail_end = fy + fh
+    x0, x1 = fx, fx + fw
+    return (
+        (fy, eye_end, x0, x1),
+        (eye_end, body_end, x0, x1),
+        (body_end, tail_end, x0, x1),
+    )
 
-    x0 = fx
-    x1 = fx + fw
-
-    eye_coords = (fy, eye_end, x0, x1)
-    body_coords = (eye_end, body_end, x0, x1)
-    tail_coords = (body_end, tail_end, x0, x1)
-
-    return eye_coords, body_coords, tail_coords
-
-
-# eye preprocessing
-def preprocess(roi_bgr):
-    gray = cv.cvtColor(roi_bgr, cv.COLOR_BGR2GRAY)
-    # gray = cv.cvtColor(roi_bgr, cv.COLOR_BGR2HSV)
-
-    # h, s, v = cv.split(gray)
-
-    clahe = cv.createCLAHE(clipLimit=3.0, tileGridSize=(4, 4))
-    gray_clahe = clahe.apply(gray)
-
-    return gray_clahe
-
-
+# Eyes
 # uses assorted type of spell
 def extract_eye(gray_clahe, roi_h, roi_w):
     candidates = []
     min_r = max(4, int(min(roi_h, roi_w) * 0.05))
     max_r = max(min_r + 4, int(min(roi_h, roi_w) * 0.35))
 
-    # blob
     params = cv.SimpleBlobDetector_Params()
     params.filterByArea = True
     params.minArea = np.pi * min_r**2 * 0.5
@@ -117,19 +106,16 @@ def extract_eye(gray_clahe, roi_h, roi_w):
     params.filterByInertia = True
     params.minInertiaRatio = 0.30
     params.filterByColor = True
-    params.blobColor = 0  # dark blobs
+    params.blobColor = 0
 
     detector = cv.SimpleBlobDetector_create(params)
+    kps = detector.detect(gray_clahe)
+    if kps:
+        kp = max(kps, key=lambda k: k.size)
+        cx, cy = int(kp.pt[0]), int(kp.pt[1])
+        r = max(min_r, int(kp.size / 2))
+        candidates.append((cx, cy, r, 0.72, "blob_gray"))
 
-    for src, label, conf in [(gray_clahe, "blob_gray", 0.72)]:
-        kps = detector.detect(src)
-        if kps:
-            kp = max(kps, key=lambda k: k.size)
-            cx, cy = int(kp.pt[0]), int(kp.pt[1])
-            r = max(min_r, int(kp.size / 2))
-            candidates.append((cx, cy, r, conf, label))
-
-    # adaptive threshold
     block = max(11, (min(roi_h, roi_w) // 4) | 1)
     adapt = cv.adaptiveThreshold(
         cv.GaussianBlur(gray_clahe, (5, 5), 0),
@@ -139,9 +125,6 @@ def extract_eye(gray_clahe, roi_h, roi_w):
         blockSize=block,
         C=8,
     )
-
-    # otsu threshold, ttry ko pa to
-    # _, adapt = cv.threshold(gray_clahe, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
 
     k3 = np.ones((3, 3), np.uint8)
     adapt = cv.morphologyEx(adapt, cv.MORPH_OPEN, k3)
@@ -175,13 +158,37 @@ def extract_eye(gray_clahe, roi_h, roi_w):
 def select_best_candidate(candidates, roi_h, roi_w):
     def score(c):
         cx, cy, r, conf, _ = c
-        border_pen = 0.25 if (
-            cx < r or cy < r or cx > roi_w - r or cy > roi_h - r
-        ) else 0
+        border_pen = (
+            0.25 if (cx < r or cy < r or cx > roi_w - r or cy > roi_h - r) else 0
+        )
         pos_bonus = 0.05 if cy < roi_h * 0.60 else 0
         return conf + pos_bonus - border_pen
 
     return max(candidates, key=score)
+
+
+def eye_clarity(eye):
+    if eye is None or eye.size == 0:
+        return 0.0, 0.0
+
+    gray = cv.cvtColor(eye, cv.COLOR_BGR2GRAY)
+
+    valid = gray > 10
+    if np.sum(valid) == 0:
+        return 0.0, 0.0
+
+    lap = cv.Laplacian(gray, cv.CV_64F)
+    sharpness = lap[valid].var()
+
+    median = np.median(gray[valid])
+
+    lower = int(max(0, 0.5 * median))
+    upper = int(min(255, 1.5 * median))
+
+    edges = cv.Canny(gray, lower, upper)
+    edge_density = np.sum(edges[valid] > 0) / np.sum(valid)
+
+    return sharpness, edge_density
 
 
 # main
