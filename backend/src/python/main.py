@@ -223,6 +223,12 @@ def shininess_evaluation(body_roi):
     return specular_coverage, specular_average
 
 
+def evaluate_body_color(body_roi):
+    hsv = cv.cvtColor(body_roi, cv.COLOR_BGR2HSV)
+    h_ch, s_ch, v_ch = cv.split(hsv)
+    return np.mean(h_ch), np.mean(s_ch), np.mean(v_ch)
+
+
 # main
 def main():
     img_path = sys.argv[1] if len(sys.argv) >= 2 else "bangus.jpg"
