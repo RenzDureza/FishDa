@@ -59,13 +59,14 @@ async def predict(file: UploadFile = File(...)):
         has_fish = True
         species = "tilapia"
 
-        overall_score = rule_based_score(brightness, redness, texture)
-        eye_score = overall_score * 0.5
-        body_score = overall_score * 0.3
-        tail_score = overall_score * 0.2
+        rule_score = rule_based_score(brightness, redness, texture)
+        eye_score = rule_score * 0.3
+        gill_score = rule_score * 0.5
+        body_score = rule_score * 0.15
+        tail_score = rule_score * 0.05
         ml_score = dummy_ml_score(brightness, redness, texture)
 
-        average_score = (overall_score + ml_score) / 2
+        average_score = (rule_score + ml_score) / 2
 
         if average_score > 0.7:
             quality = "high"
@@ -77,12 +78,23 @@ async def predict(file: UploadFile = File(...)):
         return {
             "has_fish": has_fish,
             "species": species,
-            "eye_score": eye_score,
-            "body_score": body_score,
-            "tail_score": tail_score,
-            "overall_score": overall_score,
+            "features": {
+                "eye_score": eye_score,
+                "gill_score": gill_score,
+                "body_score": body_score,
+                "tail_score": tail_score,
+            },
+            "rule_score": rule_score,
             "ml_score": ml_score,
-            "quality": quality
+            "final_score": average_score,
+            "quality": quality,
+            
+
+            # "species": species,
+            # "features": features,
+            # "rule_score": rule_score,
+            # "ml_score": ml_score,
+            # "quality": quality,
         }
 
     except ValueError as err:

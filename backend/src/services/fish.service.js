@@ -2,12 +2,16 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
 
-const ML_SERVICE_URL = "http://localhost:8000/predict";
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL;
 
-export const analyzeFish = async (file) => {
+export const analyzeFish = async ({ fishImage, gillImage }) => {
     const form_data = new FormData();
     
-    form_data.append("file", fs.createReadStream(file.path));
+    form_data.append("fish_image", fs.createReadStream(fishImage.path));
+
+    if (gillImage){
+        form_data.append("body_image", fs.createReadStream(gillImage.path));
+    }
 
     try {
         const response = await axios.post(ML_SERVICE_URL, form_data, {
@@ -18,12 +22,20 @@ export const analyzeFish = async (file) => {
         return {
             has_fish: response.data.has_fish,
             species: response.data.species,
-            eye_score: response.data.eye_score,
-            body_score: response.data.body_score,
-            tail_score: response.data.tail_score,
-            overall_score: response.data.rule_score,
+            eye_score: response.data.features.eye_score,
+            gill_score: response.data.features.gill_score,
+            body_score: response.data.features.body_score,
+            tail_score: response.data.features.tail_score,
+            rule_score: response.data.rule_score,
             ml_score: response.data.ml_score,
+            final_score: response.data.final_score,
             quality: response.data.quality,
+
+            // species: response.data.species,
+            // features: response.data.features,
+            // rule_score: response.data.rule_score,
+            // ml_score: response.data.ml_score,
+            // quality: response.data.quality,
         };
     } catch (err) {
         if (err.code === "ECONNREFUSED") {
@@ -48,12 +60,16 @@ export const analyzeFish = async (file) => {
         error.status = 500;
         throw error;
     } finally {
-        try {
-            if (file?.path && fs.existsSync(file.path)) {
-                await fs.promises.unlink(file.path);
+        const files = [fishImage, gillImage];
+
+        for (const file of files){
+            try {
+                if (file?.path && fs.existsSync(file.path)) {
+                    await fs.promises.unlink(file.path);
+                }
+            } catch (e) {
+                console.error("Failed to delete file: ", e);
             }
-        } catch (e) {
-            console.error("Failed to delete file: ", e);
-        }
+        } 
     }
 };

@@ -52,22 +52,25 @@ export default function Capture(){
     }
 
     const captureImage = async () => {
-        console.log("Camera Ref: ", cameraRef);
         if (!cameraRef.current) return;
 
-        const image = await cameraRef.current.takePictureAsync({quality: 0.6, exif: true,});
+        const image = await cameraRef.current.takePictureAsync({
+            quality: 0.6, 
+            exif: true,
+        });
 
         if(!firstUri){ //first capture
             setFirstUri(image.uri);
             Alert.alert('Fish Body Captured!', 'Next is Capture Gills, or Skip to Proceed', [{text: 'OK'}]);
         } else {
-        router.push({ // Second capture, proceed to result
-            pathname: "/scan/result",
-            params: {
-                uri: firstUri,
-                uri2: image.uri,
-                metadata: JSON.stringify(image.exif)}
-        });
+        // router.push({ // Second capture, proceed to result
+        //     pathname: "/scan/result",
+        //     params: {
+        //         uri: firstUri,
+        //         uri2: image.uri,
+        //         metadata: JSON.stringify(image.exif)
+        // });
+        await upload(firstUri, image.uri);
     }
 }
 
@@ -82,7 +85,7 @@ export default function Capture(){
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ['images'],
             allowsEditing: true,
-            aspect: [3,4],
+            aspect: [BOX_WIDTH,BOX_HEIGHT],
             quality: 0.6
         })
 
@@ -90,12 +93,61 @@ export default function Capture(){
 
         if (!result.canceled){
             const resultUri = result.assets[0].uri;
+            await upload(resultUri);
             setImage(resultUri)
 
             router.push({
             pathname: "/scan/result",
             params: { uri: resultUri, metadata: JSON.stringify(result.assets[0])}
             });
+        }
+    }
+
+    const upload = async (fishUri: string, gillUri?: string) => {
+        // console.log("TYPE OF URI:", typeof uri);
+        // console.log("URI VALUE:", uri);
+        const form_data = new FormData();
+
+        // Required fish image
+        form_data.append("fish_image", {
+            uri: fishUri,
+            name: "fish.jpg",
+            type: "image/jpeg",
+        } as any);
+
+        // Optional gill image
+        if(gillUri){
+            form_data.append("gill_image", {
+                uri: gillUri,
+                name: "gills.jpg",
+                type: "image/jpeg",
+            } as any);
+        }
+
+        try {
+            const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/fish/analyze`, 
+                {
+                    method: "POST",
+                    body: form_data,
+                });
+
+            console.log("Fish URI: ", fishUri);
+            console.log("Gills URI: ", gillUri);
+
+            const result = await response.json();
+            console.log("JSON Response: ", result);
+
+            router.push({
+                pathname: "/scan/result",
+                params: {
+                    result: JSON.stringify(result),
+                    uri: fishUri,
+                    uri2: gillUri ?? "",
+                },
+            });
+        } catch (error) {
+            console.error("Upload error: ", error);
+            Alert.alert("Error", "Failed to process image");
         }
     }
 
@@ -229,10 +281,11 @@ export default function Capture(){
 
             {firstUri && (
                 <TouchableOpacity
-                    onPress={() => router.push({
-                        pathname: '/scan/result',
-                        params: { uri: firstUri, metadata: JSON.stringify({}) },
-                    })}
+                    onPress={async () => {
+                        if (firstUri) {
+                            await upload(firstUri);
+                        }
+                    }}
                     className="absolute bottom-40 self-center z-10 bg-black/60 px-6 py-2 rounded-full">
                     <Text className="text-white font-semibold">Skip Gills</Text>
                 </TouchableOpacity>
