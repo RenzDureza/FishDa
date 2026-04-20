@@ -3,7 +3,7 @@ import numpy as np
 import os
 import sys
 
-# for debugging
+# for debugging shits
 def save(name, img, dir="eye_debug"):
     os.makedirs(dir, exist_ok=True)
     if img is None or img.size == 0:
@@ -255,34 +255,53 @@ def main():
     body_roi = img[by0:by1, bx0:bx1]
     tail_roi = img[ty0:ty1, tx0:tx1]
 
+    # feature extraction for eyes
     gray_clahe = preprocess(eye_roi)
-
     roi_h, roi_w = gray_clahe.shape[:2]
 
     candidates = extract_eye(gray_clahe, roi_h, roi_w)
-
     if not candidates:
         print("No eye detected")
         return
 
     cx, cy, r, conf, method = select_best_candidate(candidates, roi_h, roi_w)
+    full_cx, full_cy = ex0 + cx, ey0 + cy
 
-    full_cx = ex0 + cx
-    full_cy = ey0 + cy
+    eye_mask = np.zeros((img_h, img_w), dtype=np.uint8)
+    cv.circle(eye_mask, (full_cx, full_cy), r, 255, -1)
+    eye_isolated = cv.bitwise_and(img, img, mask=eye_mask)
 
-    result = img.copy()
+    # for random forest
+    eye_redness_ratio = eye_redness(eye_isolated)
+    sharpness, edge_density = eye_clarity(eye_isolated)
 
-    # for debugging
-    cv.circle(result, (full_cx, full_cy), r, (0, 255, 0), 2)
+    # feature extraction for body
+    specular_coverage, specular_average = shininess_evaluation(body_roi)
+    h_mean_body, s_mean_body, v_mean_body,= evaluate_body_color(body_roi)
 
-    save("result", result)
-    save("eye", eye_roi)
-    save("body", body_roi)
-    save("tail", tail_roi)
+    print("eye clarity: ", sharpness)
+    print("eye edge density: ", edge_density)
+    print("eye redness: ", eye_redness_ratio)
+    print("body mean Hue: ", h_mean_body)
+    print("body mean Saturation: ", s_mean_body)
+    print("body mean Value: ", v_mean_body)
+    print("body shine coverage: ", specular_coverage)
+    print("body shine average: ", specular_average)
 
-    print("Done:", (full_cx, full_cy), r)
-    print("Best Candidate: ", method)
+    
+    # for debugging shits
+    # result = img.copy()
+    # cv.circle(result, (full_cx, full_cy), r, (0, 0, 255), 5)
+    # cv.circle(eye_mask, (full_cx, full_cy), r, 255, -1)
+    # save("result", result)
+    # save("eye", eye_roi)
+    # save("body", body_roi)
+    # save("tail", tail_roi)
+    # save("isolate_eye", eye_isolated)
 
+    # print("Done:", (full_cx, full_cy), r)
+    # print("Best Candidate:", method)
+    # print("Body_Color:", body_color)
 
 if __name__ == "__main__":
     main()
