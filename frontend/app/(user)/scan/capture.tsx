@@ -140,7 +140,7 @@ export default function Capture(){
             router.push({
                 pathname: "/scan/result",
                 params: {
-                    result: JSON.stringify(result),
+                    result: JSON.stringify(result.data),
                     uri: fishUri,
                     uri2: gillUri ?? "",
                 },

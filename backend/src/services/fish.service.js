@@ -10,7 +10,7 @@ export const analyzeFish = async ({ fishImage, gillImage }) => {
     form_data.append("fish_image", fs.createReadStream(fishImage.path));
 
     if (gillImage){
-        form_data.append("body_image", fs.createReadStream(gillImage.path));
+        form_data.append("gill_image", fs.createReadStream(gillImage.path));
     }
 
     try {
