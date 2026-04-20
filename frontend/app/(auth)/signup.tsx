@@ -2,7 +2,7 @@ import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-nat
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -53,6 +53,10 @@ export default function SignUp() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Registered Successfully!");
+					router.replace({
+						pathname: "/verifyEmail",
+						params: { email }
+					});
 				} else {
 					setError(data.message || "Registration Failed");
 				}

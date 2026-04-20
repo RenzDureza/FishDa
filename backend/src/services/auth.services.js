@@ -19,7 +19,7 @@ export const register = async ({ username, email, password }) => {
 	const verificationToken = jwt.sign(
 		{ email },
 		process.env.JWT_SECRET,
-		{ expiresIn: "24h" }
+		{ expiresIn: "5m" }
 	);
 
 	const sql = "INSERT INTO `users` (`username`, `email`, `password`, `verification_token`) VALUES (?, ?, ?, ?)";

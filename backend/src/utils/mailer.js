@@ -18,7 +18,7 @@ export const sendVerificationEmail = async (toEmail, verificationLink) => {
       <h2>Welcome!</h2>
       <p>Click the link below to verify your email:</p>
       <a href="${verificationLink}">Verify Email</a>
-      <p>This link expires in 24 hours.</p>
+      <p>This link expires in 5 minutes.</p>
     `,
   });
 };
