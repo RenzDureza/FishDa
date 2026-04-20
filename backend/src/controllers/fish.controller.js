@@ -18,6 +18,12 @@ export const analyzeFish = async (req, res) => {
         
         const result = await fishService.analyzeFish({fishImage, gillImage});
 
+        if (!result.has_fish) {
+            return res.status(400).json({
+                status: "error",
+                message: "No fish detected in image.",
+            })
+        }
         return res.status(200).json({
             status: "success",
             message: "Fish image analyzed successfully",
