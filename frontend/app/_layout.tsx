@@ -1,10 +1,9 @@
-import { Stack, Slot } from "expo-router";
+import { Stack, Slot, router } from "expo-router";
 import "./global.css"
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider } from "@/utils/authContext";
 import { useEffect } from "react";
 import * as Linking from "expo-linking";
-import { router } from "expo-router";
 
 
 export default function RootLayout() {
