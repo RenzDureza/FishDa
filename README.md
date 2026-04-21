@@ -17,6 +17,12 @@
 
 ***
 
+## How to run the Backend:
+1. Inside the repository, navigate to the backend directory: `cd backend`.
+2. Start the server: `npm run dev`.
+
+***
+
 ## How to run the Frontend:
 1. Inside the repository, navigate to the frontend directory: `cd frontend`.
 2. Start the development server: `npx expo start`.
@@ -29,8 +35,35 @@
 
 ***
 
-## How to run the Backend:
-1. Inside the repository, navigate to the backend directory: `cd backend`.
-2. Start the server: `npm run dev`.
+## How to run Python File:
+1. python -m uvicorn main:app --reload
 
+***
 
+## EYES
+    eye_clarity
+    edge_density
+    eyes_redness
+OVERALL_EYES
+
+## GILLS
+    gills_hue
+    gills_saturation
+    gills_value
+OVERALL_GILLS
+
+## BODY
+    shine_coverage
+    shine_average
+    body_hue
+    body_saturation
+    body_value
+    ? body damage
+OVERALL_BODY
+
+## TAIL
+    ? tail damage
+OVERALL_TAIL
+
+## ML
+OVERALL_SCORE

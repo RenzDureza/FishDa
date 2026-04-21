@@ -4,6 +4,6 @@ import { analyzeFish } from "../controllers/fish.controller.js";
 
 const router = Router();
 
-router.post("/fish/analyze", upload.single("image"), analyzeFish);
+router.post("/analyze", upload.fields([{name: "fish_image", maxCount: 1}, {name: "gill_image", maxCount: 1}]), analyzeFish);
 
 export default router;
