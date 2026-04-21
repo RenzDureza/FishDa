@@ -36,10 +36,10 @@ export const register = async ({ username, email, password }) => {
 };
 
 export const login = async ({ email, password }) => {
-	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, 'is_verified' FROM `users` WHERE `email` = ?", [email]);
+	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, `is_verified` FROM `users` WHERE `email` = ?", [email]);
 
 	if(!records.length){
-		throw new Error("Invalid Email or Password");
+		throw new Error("Email does not exist");
 	}
 
 	const user = records[0];
