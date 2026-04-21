@@ -1,6 +1,7 @@
 import * as authService from "../services/auth.services.js";
 import { validate } from "../utils/validate.js";
 import jwt from "jsonwebtoken";
+import { verifiedSuccessHTML, verifiedFailHTML } from "../utils/emailTemp.js";
 
 export const register = async (req, res) => {
 	const { username, email, password } = req.body;
@@ -68,8 +69,8 @@ export const verifyEmail = async (req, res) => {
 
   try {
     const result = await authService.verifyEmail(token);
-    res.status(200).json(result); //redirect to sign-in page somehow
+    res.send(verifiedSuccessHTML);
   } catch (err) {
-    res.status(400).json({ message: "Link is invalid or has expired." });
+    res.send(verifiedFailHTML);
   }
 };

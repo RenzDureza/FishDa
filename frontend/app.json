@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "IsdaOK",
+    "slug": "IsdaOK",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/Isda-iconS.png",
-    "scheme": "frontend",
+    "scheme": "isdaok",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -18,7 +18,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.frontend"
+      "package": "com.anonymous.IsdaOK"
     },
     "web": {
       "bundler": "metro",
