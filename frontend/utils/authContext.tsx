@@ -14,10 +14,10 @@ type AuthState = {
 };
 
 type JWTPayload = {
-    userID: number;
+    id: number;
     username: string;
     role: string;
-    expire: number;
+    exp: number;
 }
 
 const TOKEN_KEY = "token-key";
@@ -90,7 +90,7 @@ export function AuthProvider({ children }: PropsWithChildren){
 
                 if(token) {
                     const decoded = jwtDecode<JWTPayload>(token);
-                    const isExpired = decoded.expire * 1000 < Date.now();
+                    const isExpired = decoded.exp * 1000 < Date.now();
 
                     if(!isExpired){
                         setIsLoggedIn(true);
