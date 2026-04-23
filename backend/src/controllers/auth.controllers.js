@@ -1,7 +1,7 @@
 import * as authService from "../services/auth.services.js";
 import { validate } from "../utils/validate.js";
 import jwt from "jsonwebtoken";
-import { verifiedSuccessHTML, verifiedFailHTML } from "../utils/emailTemp.js";
+import { verifiedSuccessHTML, verifiedFailHTML, resetPasswordHTML, resetSuccessHTML } from "../utils/emailTemp.js";
 
 export const register = async (req, res) => {
 	const { username, email, password } = req.body;
@@ -84,4 +84,30 @@ export const resendVerification = async (req, res) => {
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
+};
+
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const result = await authService.forgotPassword(email);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  const { token } = req.query;
+
+  if (req.method === "GET") {
+    return res.send(resetPasswordHTML(token, process.env.BASE_URL));
+  }
+
+  const { token: bodyToken, newPassword } = req.body;
+	try {
+		await authService.resetPassword(bodyToken, newPassword);
+		res.send(resetSuccessHTML);
+	} catch (err) {
+		res.status(400).json({ message: err.message });
+	}
 };
