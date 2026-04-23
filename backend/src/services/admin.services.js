@@ -7,7 +7,7 @@ export const showUsers = async () => {
 };
 
 export const searchUsers = async (query) => {
-	const [records] = await db.query("SELECT `id`, `username` FROM `users` WHERE `username` LIKE ?", [`${query}%`]);
+	const [records] = await db.query("SELECT `id`, `username` FROM `users` WHERE  `role` != 'admin' AND `username` LIKE ?", [`${query}%`]);
 
 	return records;
 };

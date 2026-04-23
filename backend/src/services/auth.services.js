@@ -163,6 +163,7 @@ export const resetPassword = async (token, newPassword) => {
 
 	return { status: "success", message: "Password Reset Sucessfully!"}
 };
+
 export const getUserID = async (id) => {
 	const [records] = await db.query("SELECT `id`, `username`, `role` FROM `users` WHERE `id` = ?", [id]);
 

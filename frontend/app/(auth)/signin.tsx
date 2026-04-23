@@ -11,6 +11,7 @@ import { sanitizeEmail } from "@/utils/sanitize";
 import { validateEmail } from "@/utils/validate";
 import { apiFetch} from "@/utils/api";
 import * as Biometric from "@/utils/biometric";
+import * as SecureStore from "expo-secure-store";
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
@@ -52,7 +53,7 @@ export default function SignIn() {
 					setSuccess("Login Successful");
 					const hasHardware = await LocalAuthentication.hasHardwareAsync();
 					const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-					const hasBiometric = await Biometric.hasBiometric();
+					const hasBiometric = await Biometric.hasBiometric(email);
 
 					if(hasHardware && isEnrolled && !hasBiometric){
 						Alert.alert(
@@ -77,6 +78,7 @@ export default function SignIn() {
           				  	]
           				);
 					} else {
+						await SecureStore.setItemAsync("biometric-email", email);
 						await logIn(data.token);
 					}
 				} else {
