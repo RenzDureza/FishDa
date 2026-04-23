@@ -30,7 +30,6 @@ export default function AdminLayout() {
             headerShadowVisible: false,
             headerTitleAlign: "center",
             }}>
-              <Stack.Screen name="index" />
               <Stack.Screen name="manage"
                 options={{
                 headerShown: true,

@@ -21,7 +21,7 @@ export default function AdminHome() {
 				</TouchableOpacity>
 
 				<TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => { logOut() }}>
-					<Text className="text-center font-semibold text-[#0B1D51] ">Logout</Text>
+					<Text className="text-center font-semibold text-[#0B1D51] ">Sign Out</Text>
 				</TouchableOpacity>
 
 			</View>
