@@ -1,7 +1,6 @@
 import { createContext, PropsWithChildren, useState, useContext, useEffect } from "react";
 import { useRouter } from "expo-router";
-//import * as SecureStore from "expo-secure-store";
-import { storage } from "./storage";
+import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 
 type AuthState = {
@@ -22,9 +21,7 @@ type JWTPayload = {
 
 const TOKEN_KEY = "token-key";
 
-//SecureStore is for only working on mobile. If including web version, use storage.
-//export const getStoredToken = () => SecureStore.getItemAsync(TOKEN_KEY);
-export const getStoredToken = () => storage.getItem(TOKEN_KEY);
+export const getStoredToken = () => SecureStore.getItemAsync(TOKEN_KEY);
 
 export const AuthContext = createContext<AuthState>({
     isLoggedIn: false,
@@ -53,8 +50,7 @@ export function AuthProvider({ children }: PropsWithChildren){
                 return
             }
             const decoded = jwtDecode<JWTPayload>(token);
-            //await SecureStore.setItemAsync(TOKEN_KEY, token);
-            await storage.setItem(TOKEN_KEY, token);
+            await SecureStore.setItemAsync(TOKEN_KEY, token);
             setIsLoggedIn(true);
             setRole(decoded.role);
             setUsername(decoded.username);
@@ -71,8 +67,7 @@ export function AuthProvider({ children }: PropsWithChildren){
 
     const logOut = async () => {
         try{
-            //await SecureStore.deleteItemAsync(TOKEN_KEY);
-            await storage.deleteItem(TOKEN_KEY);
+            await SecureStore.deleteItemAsync(TOKEN_KEY);
         } catch(err){
             console.error("logOut error: ", err);
         }
@@ -85,8 +80,7 @@ export function AuthProvider({ children }: PropsWithChildren){
     useEffect(() => {
         const restoreSession = async () => {
             try {
-                //const token = await SecureStore.getItemAsync(TOKEN_KEY);
-                const token = await storage.getItem(TOKEN_KEY);
+                const token = await SecureStore.getItemAsync(TOKEN_KEY);
 
                 if(token) {
                     const decoded = jwtDecode<JWTPayload>(token);
@@ -97,8 +91,7 @@ export function AuthProvider({ children }: PropsWithChildren){
                         setRole(decoded.role);
                         setUsername(decoded.username);
                     } else {
-                        //await SecureStore.deleteItemAsync(TOKEN_KEY);
-                        await storage.deleteItem(TOKEN_KEY);
+                        await SecureStore.deleteItemAsync(TOKEN_KEY);
                     }
                 }
             } catch(err) {
