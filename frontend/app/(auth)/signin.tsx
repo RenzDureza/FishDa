@@ -3,13 +3,14 @@ import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
 import { Link, router } from "expo-router";
-import { useState } from "react";
-import { useAuth } from "../../utils/authContext";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/utils/authContext";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { sanitizeEmail } from "@/utils/sanitize";
 import { validateEmail } from "@/utils/validate";
 import { apiFetch} from "@/utils/api";
+import * as Biometric from "@/utils/biometric";
 
 export default function SignIn() {
 	const [email, setEmail] = useState("");
@@ -17,9 +18,20 @@ export default function SignIn() {
 	const [success, setSuccess] = useState("");
 	const [error, setError] = useState("");
 	const [emailError, setEmailError] = useState<string[]>([]);
+	const [biometric, setBiometric] = useState(false);
 
 	//const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
 	const { logIn } = useAuth();
+
+	useEffect (() => {
+		const checkBiometrics = async () => {
+			const hasHardware = await LocalAuthentication.hasHardwareAsync();
+			const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+			const hasSetup = await Biometric.hasBiometric();
+			setBiometric(hasHardware && isEnrolled && hasSetup);
+		};
+		checkBiometrics();
+	}, []);
 
 	const loginUser = async () => {
 		setSuccess('');
@@ -38,7 +50,35 @@ export default function SignIn() {
 
 				if (res.ok && data.status === "success") {
 					setSuccess("Login Successful");
-					await logIn(data.token);
+					const hasHardware = await LocalAuthentication.hasHardwareAsync();
+					const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+					const hasBiometric = await Biometric.hasBiometric();
+
+					if(hasHardware && isEnrolled && !hasBiometric){
+						Alert.alert(
+          				  	"Enable Biometrics",
+          				  	"Would you like to use Biometrics for future logins?",
+          				  	[
+          				  	  {
+          				  	    text: "Yes",
+          				  	    onPress: async () => {
+          				  	    	await Biometric.saveBiometric(data.token, email);
+          				  	    	setBiometric(true);
+									await logIn(data.token);
+          				  	    },
+          				  	  },
+          				  	  { 
+								text: "Not Now",
+								style: "cancel",
+								onPress: async () => {
+									await logIn(data.token);
+								},
+							  },
+          				  	]
+          				);
+					} else {
+						await logIn(data.token);
+					}
 				} else {
 					setError(data.message || "Invalid Email or Password");
 				}
@@ -50,11 +90,39 @@ export default function SignIn() {
 	const biometricsAuth = async () => {
 		try {
 			const biometricsResult = await LocalAuthentication.authenticateAsync({
-				promptMessage: 'Login via Authentication'
+				promptMessage: 'Login via Authentication',
+				fallbackLabel: 'Use passcode',
+				disableDeviceFallback: false,
 			});
 
 			if (biometricsResult.success){
-				logIn("guest"); // ito muna for now
+				const token = await Biometric.getBiometricToken();
+
+				if(!token){
+					await Biometric.deleteBiometric();
+					setBiometric(false);
+					setError("Biometric expired. Login via Password");
+					return;
+				}
+				
+				const res = await apiFetch("/api/auth/verify-token", {
+					method: "POST",
+					headers: { 
+						"Content-Type": "application/json",
+						"Authorization": `Bearer ${token}`,
+					},
+				});
+
+				const data = await res.json();
+
+				if(res.ok && data.status === "success"){
+					await Biometric.refreshBiometricToken(data.token);
+					await logIn(data.token);
+				} else {
+					await Biometric.deleteBiometric();
+					setBiometric(false);
+					setError("Biometric expired. Login via Password");
+				}
 			} else {
 				Alert.alert("Error: " + biometricsResult.error);
 			}
@@ -119,7 +187,8 @@ export default function SignIn() {
 							<Image source={gicon} style={{ width: 46, height: 46 }} resizeMode="contain" />
 						</TouchableOpacity>
 
-						<TouchableOpacity onPress={biometricsAuth} className="flex-row items-center justify-center rounded-lg py-3">
+						<TouchableOpacity onPress={biometricsAuth} className="flex-row items-center justify-center rounded-lg py-3"
+						disabled={!biometric} style={{ opacity: biometric ? 1 : 0.2 }}>
 							<Ionicons name="finger-print" size={46} color="black" />
 						</TouchableOpacity>
 					</View>

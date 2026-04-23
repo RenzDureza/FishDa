@@ -21,7 +21,8 @@ export const register = async (req, res) => {
 			message: "User Created",
 		});
 	} catch (err) {
-		res.status(500).json({
+		res.status(err.status ?? 400).json({
+			status: "error",
 			message: err.message
 		});
 	}
@@ -30,7 +31,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
 	const { email, password } = req.body;
 
-	const errors = validate({ email, password }, ['email', 'password']);
+	const errors = validate({ email, password }, ['email']);
 	if(Object.keys(errors).length > 0){
 		return res.status(422).json({
 			status: "error", errors
@@ -58,7 +59,8 @@ export const login = async (req, res) => {
 			token
 		});
 	} catch (err) {
-		res.status(err.status ?? 500).json({
+		res.status(err.status ?? 400).json({
+			status: "error",
 			message: err.message
 		});
 	}
@@ -109,5 +111,30 @@ export const resetPassword = async (req, res) => {
 		res.send(resetSuccessHTML);
 	} catch (err) {
 		res.status(400).json({ message: err.message });
+	}
+};
+export const verifyToken = async (req, res) => {
+	try{
+		const user = await authService.getUserID(req.user.id);
+
+		const newToken = jwt.sign({
+			id: user.id,
+			username: user.username,
+			role: user.role,
+		},
+			process.env.JWT_SECRET,
+			{ expiresIn: '7d' }
+		);
+
+		res.status(200).json({
+			status: "success",
+			message: "Valid token",
+			token: newToken,
+		});
+	} catch (err) {
+		res.status(err.status ?? 400).json({
+			status: "error",
+			message: err.message,
+		});
 	}
 };

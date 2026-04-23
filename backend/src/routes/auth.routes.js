@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword } from "../controllers/auth.controllers.js";
+import { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword, verifyToken } from "../controllers/auth.controllers.js";
 import { showUsers } from "../controllers/admin.controllers.js";
 import { auth, requireRole } from "../utils/auth.js";
 import rateLimit from "express-rate-limit";
@@ -20,5 +20,6 @@ router.post("/resend-verification", authLimiter, resendVerification);
 router.post("/forgot-password", authLimiter,forgotPassword);
 router.get("/reset-password", resetPassword);
 router.post("/reset-password", resetPassword);
+router.post("/verify-token", auth, verifyToken);
 
 export default router;

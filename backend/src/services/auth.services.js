@@ -36,10 +36,10 @@ export const register = async ({ username, email, password }) => {
 };
 
 export const login = async ({ email, password }) => {
-	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, 'is_verified' FROM `users` WHERE `email` = ?", [email]);
+	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, `is_verified` FROM `users` WHERE `email` = ?", [email]);
 
 	if(!records.length){
-		throw new Error("Invalid Email or Password");
+		throw new Error("User not found");
 	}
 
 	const user = records[0];
@@ -162,4 +162,13 @@ export const resetPassword = async (token, newPassword) => {
 	);
 
 	return { status: "success", message: "Password Reset Sucessfully!"}
+};
+export const getUserID = async (id) => {
+	const [records] = await db.query("SELECT `id`, `username`, `role` FROM `users` WHERE `id` = ?", [id]);
+
+	if(!records.length){
+		throw new Error("User not found");
+	}
+
+	return records[0];
 };

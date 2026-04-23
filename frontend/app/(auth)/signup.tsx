@@ -1,11 +1,9 @@
 import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png";
 import gicon from "@/assets/images/g-iconL.png";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import * as LocalAuthentication from 'expo-local-authentication';
 import { useAuth } from "@/utils/authContext";
 import { sanitizeEmail, sanitizePassword, sanitizeUsername } from "@/utils/sanitize";
 import { validateEmail, validatePassword, validateUsername } from "@/utils/validate";
@@ -37,7 +35,7 @@ export default function SignUp() {
 		if (emailError.length > 0) return setError("Invalid Email");
 		if (usernameError.length > 0) return setError("Invalid Username");
 		if (passwordError.length > 0) return setError("Invalid Password");
-		if (confPasswordError) return setError("Passwords do not mactch");
+		if (confPasswordError) return setError("Passwords do not match");
 
 		try {
 				const res = await apiFetch("/api/auth/register", {
@@ -62,21 +60,6 @@ export default function SignUp() {
 				}
 		} catch (err) {
 			setError ("Network Error " + String(err));
-		}
-	}
-
-	const biometricsAuth = async () => {
-		try {
-			const biometricsResult = await LocalAuthentication.authenticateAsync({
-				promptMessage: 'Login via Authentication'
-			});
-			if (biometricsResult.success){
-				logIn("guest");
-			} else {
-				Alert.alert("Error: " + biometricsResult.error);
-			}
-		} catch (err) {
-			Alert.alert("Error: ", String(err));
 		}
 	}
 
@@ -178,12 +161,8 @@ export default function SignUp() {
 					</View>
 
 					<View className="flex-row">
-						<TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3 mr-10">
+						<TouchableOpacity className="flex-row items-center justify-center rounded-lg py-3">
 							<Image source={gicon} style={{ width: 46, height: 46 }} resizeMode="contain" />
-						</TouchableOpacity>
-
-						<TouchableOpacity onPress={biometricsAuth} className="flex-row items-center justify-center rounded-lg py-3">
-							<Ionicons name="finger-print" size={46} color="black" />
 						</TouchableOpacity>
 					</View>
 
