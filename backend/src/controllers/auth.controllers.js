@@ -78,18 +78,27 @@ export const verifyEmail = async (req, res) => {
 };
 
 export const verifyToken = async (req, res) => {
-	const newToken = jwt.sign({
-		id: req.user.userID,
-		username: req.user.username,
-		role: req.user.role,
-	},
-		process.env.JWT_SECRET,
-		{ expiresIn: '7d' }
-	);
-
-	res.status(200).json({
-		status: "success",
-		message: "Valid token",
-		token: newToken,
-	});
+	try{
+		const user = await authService.getUserID(req.user.id);
+		
+		const newToken = jwt.sign({
+			id: user.id,
+			username: user.username,
+			role: user.role,
+		},
+			process.env.JWT_SECRET,
+			{ expiresIn: '7d' }
+		);
+	
+		res.status(200).json({
+			status: "success",
+			message: "Valid token",
+			token: newToken,
+		});
+	} catch (err) {
+		res.status(err.status ?? 400).json({
+			status: "error",
+			message: err.message,
+		});
+	}
 };

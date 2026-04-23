@@ -39,7 +39,7 @@ export const login = async ({ email, password }) => {
 	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, `is_verified` FROM `users` WHERE `email` = ?", [email]);
 
 	if(!records.length){
-		throw new Error("Email does not exist");
+		throw new Error("User not found");
 	}
 
 	const user = records[0];
@@ -81,4 +81,14 @@ export const verifyEmail = async (token) => {
 	);
 
 	return { status: "success", message: "Email verified! You can now log in." };
+};
+
+export const getUserID = async (id) => {
+	const [records] = await db.query("SELECT `id`, `username`, `role` FROM `users` WHERE `id` = ?", [id]);
+
+	if(!records.length){
+		throw new Error("User not found");
+	}
+
+	return records[0];
 };
