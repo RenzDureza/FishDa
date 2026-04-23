@@ -146,7 +146,7 @@ export default function SignIn() {
 					<View className="mt-4">
 						<Text className="font-semibold">Email</Text>
 						<TextInput
-							value={email} //remove quotation and comment
+							value={email}
 							onChangeText={setEmail}
 							onBlur={() => setEmailError(validateEmail(sanitizeEmail(email)))}
 							placeholder="JuanDelaCruz@email.com"
@@ -162,7 +162,7 @@ export default function SignIn() {
 					<View className="mt-4">
 						<Text className="font-semibold">Password</Text>
 						<TextInput
-							value={password} //remove quotation and comment
+							value={password}
 							onChangeText={setPassword}
 							placeholder="***************"
 							secureTextEntry
@@ -201,6 +201,13 @@ export default function SignIn() {
 							</Text>
 						</Link>
 					</Text>
+
+					<Link href="/forgotPassword" asChild>
+						<TouchableOpacity>
+							<Text className="text-cyan-500 underline mt-2">Forgot Password?</Text>
+						</TouchableOpacity>
+					</Link>
+
 				</View>
 			</SafeAreaView>
 		</SafeAreaProvider>
