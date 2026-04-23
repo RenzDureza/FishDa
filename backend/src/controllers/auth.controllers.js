@@ -74,3 +74,14 @@ export const verifyEmail = async (req, res) => {
     res.send(verifiedFailHTML);
   }
 };
+
+export const resendVerification = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const result = await authService.resendVerification(email);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};

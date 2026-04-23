@@ -82,3 +82,29 @@ export const verifyEmail = async (token) => {
 
 	return { status: "success", message: "Email verified! You can now log in." };
 };
+
+export const resendVerification = async (email) => {
+	const [records] = await db.query(
+    	"SELECT id, is_verified FROM users WHERE email = ?",
+    	[email]
+	);
+
+	if (!records.length) throw new Error("Email not Found");
+	if (records[0].is_verified) throw new Error("Email already verified");
+
+	const verificationToken = jwt.sign(
+		{ email },
+		process.env.JWT_SECRET,
+		{ expiresIn: "5m"}
+	);
+
+	await db.query(
+		"UPDATE users SET verification_token = ? WHERE email = ?",
+		[verificationToken, email]
+  	);
+
+	const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${verificationToken}`;
+	await sendVerificationEmail(email, verificationLink);
+
+	return { status: "success", message: "Verification email resent!"}
+};
