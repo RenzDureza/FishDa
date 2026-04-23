@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { register, login, verifyEmail, resendVerification, forgotPassword, resetPassword, verifyToken } from "../controllers/auth.controllers.js";
 import { showUsers } from "../controllers/admin.controllers.js";
-import { auth, requireRole } from "../utils/auth.js";
+import { auth } from "../utils/auth.js";
 import rateLimit from "express-rate-limit";
 
 const authLimiter = rateLimit({
@@ -13,7 +13,6 @@ const authLimiter = rateLimit({
 const router = Router();
 
 router.post("/register", register);
-router.get("/admin", auth, requireRole("admin"), showUsers);
 router.post("/login", login);
 router.get("/verify-email", verifyEmail);
 router.post("/resend-verification", authLimiter, resendVerification);

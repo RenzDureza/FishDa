@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import authRoutes from "./routes/auth.routes.js";
-import adminRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import fishRoutes from "./routes/fish.routes.js";
 
 dotenv.config({ path: ".env" });
