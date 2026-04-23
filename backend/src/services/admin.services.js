@@ -1,10 +1,13 @@
 import db from "../config/database.js";
 
-
 export const showUsers = async () => {
-	const sql = "SELECT `id`, `username`, `role` FROM `users`";
+	const [records] = await db.query("SELECT `id`, `username` FROM `users` WHERE `role` != 'admin'");
 
-	const [result] = await db.query(sql);
+	return records;
+};
 
-	return result
-}
+export const searchUsers = async (query) => {
+	const [records] = await db.query("SELECT `id`, `username` FROM `users` WHERE `username` LIKE ?", [`${query}%`]);
+
+	return records;
+};
