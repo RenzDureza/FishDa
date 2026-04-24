@@ -39,18 +39,19 @@ export const login = async (req, res) => {
 	}
 
 	try {
-		const userID = await authService.login({
+		const user = await authService.login({
 			email,
 			password
 		});
 
 		const token = jwt.sign({
-			id: userID.userID,
-			username: userID.username,
-			role: userID.role,
+			id: user.id,
+			username: user.username,
+			role: user.role,
+			session_start: Date.now()
 		},
 			process.env.JWT_SECRET,
-			{ expiresIn: '7d' }
+			{ expiresIn: '1d' }
 		);
 
 		res.status(200).json({
@@ -113,6 +114,7 @@ export const resetPassword = async (req, res) => {
 		res.status(400).json({ message: err.message });
 	}
 };
+
 export const verifyToken = async (req, res) => {
 	try{
 		const user = await authService.getUserID(req.user.id);
@@ -121,9 +123,10 @@ export const verifyToken = async (req, res) => {
 			id: user.id,
 			username: user.username,
 			role: user.role,
+			session_start: req.user.session_start
 		},
 			process.env.JWT_SECRET,
-			{ expiresIn: '7d' }
+			{ expiresIn: '1d' }
 		);
 
 		res.status(200).json({

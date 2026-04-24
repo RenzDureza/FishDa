@@ -17,6 +17,7 @@ type JWTPayload = {
     username: string;
     role: string;
     exp: number;
+    session_start: number;
 }
 
 const TOKEN_KEY = "token-key";
@@ -41,14 +42,14 @@ export function AuthProvider({ children }: PropsWithChildren){
 
     const logIn = async (token: string) => {
         try{
-            if (token === "guest"){
-                setIsLoggedIn(true);
-                setRole("user");
-                setUsername("Guest");
+            // if (token === "guest"){
+            //     setIsLoggedIn(true);
+            //     setRole("user");
+            //     setUsername("Guest");
 
-                router.replace("/(user)/(drawer)/home");
-                return
-            }
+            //     router.replace("/(user)/(drawer)/home");
+            //     return
+            // }
             const decoded = jwtDecode<JWTPayload>(token);
             await SecureStore.setItemAsync(TOKEN_KEY, token);
             setIsLoggedIn(true);
@@ -81,12 +82,15 @@ export function AuthProvider({ children }: PropsWithChildren){
         const restoreSession = async () => {
             try {
                 const token = await SecureStore.getItemAsync(TOKEN_KEY);
+                const MAX_SESSION_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
 
                 if(token) {
                     const decoded = jwtDecode<JWTPayload>(token);
+                    console.log("payload", decoded.username);
                     const isExpired = decoded.exp * 1000 < Date.now();
+                    const isSessionOld = Date.now() - decoded.session_start > MAX_SESSION_AGE;
 
-                    if(!isExpired){
+                    if(!isExpired && !isSessionOld){
                         setIsLoggedIn(true);
                         setRole(decoded.role);
                         setUsername(decoded.username);
@@ -96,6 +100,7 @@ export function AuthProvider({ children }: PropsWithChildren){
                 }
             } catch(err) {
                 console.error("restoreSession error: ", err);
+                await SecureStore.deleteItemAsync(TOKEN_KEY);
             }
             setIsReady(true);
         };

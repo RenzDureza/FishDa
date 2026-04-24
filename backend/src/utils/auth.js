@@ -1,5 +1,7 @@
 import jwt from "jsonwebtoken";
 
+const MAX_SESSION_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 export const auth = (req, res, next) => {
     const header = req.headers.authorization;
 
@@ -13,6 +15,12 @@ export const auth = (req, res, next) => {
 
     try{
         req.user = jwt.verify(token, process.env.JWT_SECRET);
+        
+        if(Date.now() - req.user.session_start > MAX_SESSION_AGE){
+            return res.status(401).json({
+                message: "Session expired"
+            });
+        }
         next();
     } catch(err) {
         return res.status(401).json({

@@ -54,8 +54,9 @@ export default function SignIn() {
 					const hasHardware = await LocalAuthentication.hasHardwareAsync();
 					const isEnrolled = await LocalAuthentication.isEnrolledAsync();
 					const hasBiometric = await Biometric.hasBiometric(email);
+					const biometricEnabled = await Biometric.isBiometricEnabled(email);
 
-					if(hasHardware && isEnrolled && !hasBiometric){
+					if(hasHardware && isEnrolled && !hasBiometric && !biometricEnabled){
 						Alert.alert(
           				  	"Enable Biometrics",
           				  	"Would you like to use Biometrics for future logins?",
@@ -77,6 +78,10 @@ export default function SignIn() {
 							  },
           				  	]
           				);
+					} else if(hasHardware && isEnrolled && !hasBiometric && biometricEnabled) {
+						await Biometric.saveBiometric(data.token, email);
+						setBiometric(true);
+						await logIn(data.token);
 					} else {
 						await SecureStore.setItemAsync("biometric-email", email);
 						await logIn(data.token);

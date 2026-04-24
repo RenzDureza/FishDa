@@ -58,7 +58,7 @@ export const login = async ({ email, password }) => {
 	return {
 		status: "success",
 		message: "User Logged In Successfully",
-		userID: user.id,
+		id: user.id,
 		username: user.username,
 		role: user.role
 	};
