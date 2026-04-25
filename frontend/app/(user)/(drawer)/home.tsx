@@ -4,7 +4,9 @@ import { router } from "expo-router";
 import { useAuth } from "@/utils/authContext";
 
 export default function Home() {
-  const { logOut } = useAuth();
+  const { logOut, username } = useAuth();
+  const isGuest = username === "Guest";
+
   return (
     <View className="flex-auto items-center justify-center bg-primary px-4 ">
 
@@ -13,22 +15,24 @@ export default function Home() {
         <Image source={logo} className="w-32 h-32 mb-22" resizeMode="contain"/>
 
         <Text className="text-[#0B1D51] text-3xl font-semibold text-center">
-          Welcome
+          Welcome{isGuest ? ", Guest" : `, ${username}`}
         </Text>
 
         <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4" onPress={() => router.push('/scan/capture')}>
           <Text className="text-center font-semibold text-[#0B1D51] ">Scan a Fish!</Text>
         </TouchableOpacity>
 
+        {!isGuest && (
         <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4">
         <Text className="text-center font-semibold text-[#0B1D51] ">History</Text>
         </TouchableOpacity>
+        )}
 
         <TouchableOpacity className="bg-white py-2 px-4 w-40 border border-black rounded mt-4"
             onPress={() => {
                 logOut();
             }}>
-        <Text className="text-center font-semibold text-[#0B1D51] ">Sign Out</Text>
+        <Text className="text-center font-semibold text-[#0B1D51] ">{isGuest ? "Sign In" : "Sign Out"}</Text>
         </TouchableOpacity>
 
       </View>
