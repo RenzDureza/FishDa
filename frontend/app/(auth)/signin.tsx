@@ -9,7 +9,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { sanitizeEmail } from "@/utils/sanitize";
 import { validateEmail } from "@/utils/validate";
-import { apiFetch} from "@/utils/api";
+import { apiFetch } from "@/utils/api";
 import * as Biometric from "@/utils/biometric";
 import * as SecureStore from "expo-secure-store";
 
@@ -58,26 +58,22 @@ export default function SignIn() {
 
 					if(hasHardware && isEnrolled && !hasBiometric && !biometricEnabled){
 						Alert.alert(
-          				  	"Enable Biometrics",
-          				  	"Would you like to use Biometrics for future logins?",
-          				  	[
-          				  	  {
-          				  	    text: "Yes",
-          				  	    onPress: async () => {
-          				  	    	await Biometric.saveBiometric(data.token, email);
-          				  	    	setBiometric(true);
-									await logIn(data.token);
-          				  	    },
-          				  	  },
-          				  	  {
-								text: "Not Now",
-								style: "cancel",
-								onPress: async () => {
-									await logIn(data.token);
-								},
-							  },
-          				  	]
-          				);
+          	    "Enable Biometrics",
+          			"Would you like to use Biometrics for future logins?",
+          			[{
+          				  text: "Yes",
+          				  onPress: async () => {
+          				      await Biometric.saveBiometric(data.token, email);
+          				      setBiometric(true);
+									      await logIn(data.token);
+          				  },
+          			},{
+								    text: "Not Now",
+								    style: "cancel",
+								    onPress: async () => {
+									      await logIn(data.token);
+								    },
+							},]);
 					} else if(hasHardware && isEnrolled && !hasBiometric && biometricEnabled) {
 						await Biometric.saveBiometric(data.token, email);
 						setBiometric(true);
