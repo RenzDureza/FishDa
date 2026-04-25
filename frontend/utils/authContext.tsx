@@ -42,14 +42,14 @@ export function AuthProvider({ children }: PropsWithChildren){
 
     const logIn = async (token: string) => {
         try{
-            // if (token === "guest"){
-            //     setIsLoggedIn(true);
-            //     setRole("user");
-            //     setUsername("Guest");
+             if (token === "guest"){
+                 setIsLoggedIn(true);
+                 setRole("user");
+                setUsername("Guest");
 
-            //     router.replace("/(user)/(drawer)/home");
-            //     return
-            // }
+                 router.replace("/(user)/(drawer)/home");
+                return
+             }
             const decoded = jwtDecode<JWTPayload>(token);
             await SecureStore.setItemAsync(TOKEN_KEY, token);
             setIsLoggedIn(true);

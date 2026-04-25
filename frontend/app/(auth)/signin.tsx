@@ -69,7 +69,7 @@ export default function SignIn() {
 									await logIn(data.token);
           				  	    },
           				  	  },
-          				  	  { 
+          				  	  {
 								text: "Not Now",
 								style: "cancel",
 								onPress: async () => {
@@ -111,10 +111,10 @@ export default function SignIn() {
 					setError("Biometric expired. Login via Password");
 					return;
 				}
-				
+
 				const res = await apiFetch("/api/auth/verify-token", {
 					method: "POST",
-					headers: { 
+					headers: {
 						"Content-Type": "application/json",
 						"Authorization": `Bearer ${token}`,
 					},
@@ -182,6 +182,12 @@ export default function SignIn() {
 						}}>
 						<Text className="text-[#0B1D51] text-center font-semibold">
 							Sign In
+						</Text>
+					</TouchableOpacity>
+
+					<TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4" onPress={() => logIn("guest")}>
+						<Text className="text-[#0B1D51] text-center font-semibold">
+							Continue as Guest
 						</Text>
 					</TouchableOpacity>
 
