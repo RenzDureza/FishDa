@@ -37,3 +37,24 @@ export const searchUsers = async (req, res) => {
 		});
 	}
 };
+
+export const deleteUser = async (req, res) => {
+	try {
+		const { id } = req.params;
+		const user = await adminService.deleteUser(id);
+
+		res.status(200).json({
+				status: "success",
+				message: "User deleted",
+				id: user.id,
+				username: user.username,
+				email: user.email
+			});
+		
+	} catch (err) {
+		res.status(500).json({
+			status: "error",
+			message: err.message,
+		});
+	}
+};

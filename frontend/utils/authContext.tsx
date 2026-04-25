@@ -82,15 +82,14 @@ export function AuthProvider({ children }: PropsWithChildren){
         const restoreSession = async () => {
             try {
                 const token = await SecureStore.getItemAsync(TOKEN_KEY);
-                const MAX_SESSION_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+                const MAX_SESSION_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
                 if(token) {
                     const decoded = jwtDecode<JWTPayload>(token);
-                    console.log("payload", decoded.username);
-                    const isExpired = decoded.exp * 1000 < Date.now();
-                    const isSessionOld = Date.now() - decoded.session_start > MAX_SESSION_AGE;
+                    const isTokenExpired = decoded.exp * 1000 < Date.now();
+                    const isSessionExpired = Date.now() - decoded.session_start > MAX_SESSION_DURATION;
 
-                    if(!isExpired && !isSessionOld){
+                    if(!isTokenExpired && !isSessionExpired){
                         setIsLoggedIn(true);
                         setRole(decoded.role);
                         setUsername(decoded.username);
