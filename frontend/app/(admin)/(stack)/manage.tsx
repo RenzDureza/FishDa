@@ -66,7 +66,7 @@ export default function manageUsers() {
                         const res = await apiFetch(`/api/admin/delete/${id}`, { method: "DELETE" });
                         const data = await res.json();
                         if (res.ok) {
-                            setUsers([]);
+                            setUsers((prev) => prev.filter((user) => user.id !== id));
                         } else {
                             setError(data.message || "Something went wrong");
                         }
