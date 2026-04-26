@@ -8,11 +8,11 @@ export default function Home() {
   const isGuest = username === "Guest";
 
   return (
-    <View className="flex-auto items-center justify-center bg-primary px-4 ">
+    <View className="flex-auto items-center justify-center bg-primary px-4">
 
       <View className="items-center -mt-20">
 
-        <Image source={logo} className="w-32 h-32 mb-22" resizeMode="contain"/>
+        <Image source={logo} className="w-32 h-32 mb-22 -mt-16" resizeMode="contain"/>
 
         <Text className="text-[#0B1D51] text-3xl font-semibold text-center">
           Welcome{isGuest ? ", Guest" : `, ${username}`}
