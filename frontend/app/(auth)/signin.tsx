@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, View, Image, TextInput, Alert } from "react-native";
+import { Text, TouchableOpacity, View, Image, TextInput, Alert, Modal, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import logo from "@/assets/images/Isda-iconS.png"
 import gicon from "@/assets/images/g-iconL.png";
@@ -20,6 +20,7 @@ export default function SignIn() {
 	const [error, setError] = useState("");
 	const [emailError, setEmailError] = useState<string[]>([]);
 	const [biometric, setBiometric] = useState(false);
+	const [guestTerms, setGuestTerms] = useState(false);
 
 	//const loginURL = process.env.EXPO_PUBLIC_LOGIN as string;
 	const { logIn } = useAuth();
@@ -181,7 +182,63 @@ export default function SignIn() {
 						</Text>
 					</TouchableOpacity>
 
-					<TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4" onPress={() => logIn("guest")}>
+					<Modal
+						visible={guestTerms}
+						animationType="slide"
+						transparent={true}
+						onRequestClose={() => setGuestTerms(false)}
+						>
+						<View className="flex-1 justify-end bg-black/50">
+							<View className="bg-white rounded-t-2xl px-6 pt-6 pb-10" style={{ maxHeight: '80%' }}>
+							<Text className="text-xl font-semibold text-[#0B1D51] mb-4">Guest Access</Text>
+							<ScrollView className="mb-4">
+								<Text className="text-[#0B1D51] text-sm leading-6">
+									{"By continuing as a guest, you acknowledge and agree to the following:\n\n"}
+									{"1. Limited Features\n"}
+									{"- Your scan history will not be saved.\n"}
+									{"- You will not be able to access the History feature.\n"}
+									{"- Account-specific features are unavailable.\n\n"}
+
+									{"2. Data Collection\n"}
+									{"- Fish scan images you submit may be collected and used by IsdaOK to improve our fish recognition model.\n"}
+									{"- Scan data is anonymized and used solely for research and training purposes.\n\n"}
+
+									{"3. Disclaimer\n"}
+									{"- Fish identification results are provided for informational purposes only.\n"}
+									{"- IsdaOK is not liable for any decisions made based on scan results.\n\n"}
+
+									{"4. No Account Security\n"}
+									{"- As a guest, your session is temporary and will not be restored after closing the app.\n"}
+									{"- We recommend creating an account to save your data and access all features.\n\n"}
+
+									{"5. Governing Law\n"}
+									{"These terms are governed by the laws of the Republic of the Philippines.\n\n"}
+
+									{"For the full Terms and Conditions, please create an account and review them during sign up.\n\n"}
+
+									{"Questions? Contact us at: isdaok.app@gmail.com\n"}
+								</Text>
+							</ScrollView>
+							<TouchableOpacity
+								className="bg-[#0B1D51] py-3 rounded-xl"
+								onPress={() => {
+								setGuestTerms(false);
+								logIn("guest"); // ← only logs in after agreeing
+								}}
+							>
+								<Text className="text-white text-center font-semibold">Continue as Guest</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								className="mt-3"
+								onPress={() => setGuestTerms(false)}
+							>
+								<Text className="text-[#0B1D51] text-center">Cancel</Text>
+							</TouchableOpacity>
+							</View>
+						</View>
+						</Modal>
+
+					<TouchableOpacity className="bg-white py-2 px-4 w-40 rounded shadow mt-4" onPress={() => setGuestTerms(true)}>
 						<Text className="text-[#0B1D51] text-center font-semibold">
 							Continue as Guest
 						</Text>
