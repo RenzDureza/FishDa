@@ -21,6 +21,8 @@ export default function ManageUsers() {
     }, []);
 
     const showUsers = async () => {
+        setSuccess('');
+		setError('');
         try {
             const res = await apiFetch(`/api/admin`, { method: "GET" });
             const data = await res.json();
@@ -64,6 +66,7 @@ export default function ManageUsers() {
                         const res = await apiFetch(`/api/admin/delete/${id}`, { method: "DELETE" });
                         const data = await res.json();
                         if (res.ok) {
+                            setSuccess("User deleted");
                             setUsers((prev) => prev.filter((user) => user.id !== id));
                         } else {
                             setError(data.message || "Something went wrong");
@@ -88,6 +91,10 @@ export default function ManageUsers() {
       <SafeAreaView className="flex-1 bg-[#FFE3A9]">
 
         <View className="w-full max-w-md rounded-xl items-center px-6 py-4">
+
+            {success ? <Text className="text-green-700 mx-4">{success}</Text> : null }
+            {error ? <Text className="text-red-600 mx-4">{error}</Text> : null }
+
             <View className="mt-1">
                 <TextInput
                 placeholder="Search"
