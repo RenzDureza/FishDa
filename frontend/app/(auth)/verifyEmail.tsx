@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import logo from "@/assets/images/Isda-iconS.png";
+import logo from "@/assets/images/icon.png";
 import { Link, useLocalSearchParams } from "expo-router";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useState, useEffect } from "react";

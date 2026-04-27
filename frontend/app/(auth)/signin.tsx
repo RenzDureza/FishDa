@@ -1,6 +1,6 @@
 import { Text, TouchableOpacity, View, Image, TextInput, Alert, Modal, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import logo from "@/assets/images/Isda-iconS.png"
+import logo from "@/assets/images/icon.png"
 import gicon from "@/assets/images/g-iconL.png";
 import { Link, router } from "expo-router";
 import { useEffect, useState } from "react";

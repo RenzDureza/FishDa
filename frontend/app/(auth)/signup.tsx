@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View, Image, TextInput, Modal, ScrollView } from "react-native";
-import logo from "@/assets/images/Isda-iconS.png";
+import logo from "@/assets/images/icon.png";
 import gicon from "@/assets/images/g-iconL.png";
 import { Link, router } from "expo-router";
 import { useState } from "react";

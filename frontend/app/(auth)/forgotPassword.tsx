@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View, Image, TextInput } from "react-native";
-import logo from "@/assets/images/Isda-iconS.png";
+import logo from "@/assets/images/icon.png";
 import { Link } from "expo-router";
 import { useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
