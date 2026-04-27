@@ -59,22 +59,23 @@ export default function SignIn() {
 
 					if(hasHardware && isEnrolled && !hasBiometric && !biometricEnabled){
 						Alert.alert(
-          	    "Enable Biometrics",
-          			"Would you like to use Biometrics for future logins?",
-          			[{
-          				  text: "Yes",
-          				  onPress: async () => {
-          				      await Biometric.saveBiometric(data.token, email);
-          				      setBiometric(true);
-									      await logIn(data.token);
-          				  },
-          			},{
-								    text: "Not Now",
-								    style: "cancel",
-								    onPress: async () => {
-									      await logIn(data.token);
-								    },
-							},]);
+          	    			"Enable Biometrics",
+          					"Would you like to use Biometrics for future logins?",
+          					[{
+          				  		text: "Yes",
+          				  		onPress: async () => {
+          				  		    await Biometric.saveBiometric(data.token, email);
+          				  		    setBiometric(true);
+									await logIn(data.token);
+          				  		},
+          					},{
+								text: "Not Now",
+								style: "cancel",
+								onPress: async () => {
+									await logIn(data.token);
+								},
+							},]
+						);
 					} else if(hasHardware && isEnrolled && !hasBiometric && biometricEnabled) {
 						await Biometric.saveBiometric(data.token, email);
 						setBiometric(true);
