@@ -16,14 +16,22 @@ export const register = async ({ username, email, password }) => {
 
 	const hashed_pass = await bcrypt.hash(password, 10);
 
+	const [result] = await db.query(
+		"INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+		[username, email, hashed_pass]);
+
 	const verificationToken = jwt.sign(
 		{ email },
 		process.env.JWT_SECRET,
 		{ expiresIn: "5m" }
 	);
 
-	const sql = "INSERT INTO `users` (`username`, `email`, `password`, `verification_token`) VALUES (?, ?, ?, ?)";
-	const [result] = await db.query(sql, [username, email, hashed_pass, verificationToken]);
+	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+
+	await db.query(
+		"INSERT INTO user_tokens (user_id, type, token, expires_at) VALUES (?, 'verification', ?, ?)",
+		[result.insertId, verificationToken, expiry]
+	);
 
 	const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${verificationToken}`;
 	await sendVerificationEmail(email, verificationLink);
@@ -39,7 +47,7 @@ export const login = async ({ email, password }) => {
 	const [records] = await db.query("SELECT `id`, `username`, `password`, `role`, `is_verified` FROM `users` WHERE `email` = ?", [email]);
 
 	if(!records.length){
-		throw new Error("User not found");
+		throw new Error("Invalid Email or Password");
 	}
 
 	const user = records[0];
@@ -68,17 +76,15 @@ export const verifyEmail = async (token) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
   	const [records] = await db.query(
-    	"SELECT id, is_verified FROM users WHERE email = ?",
-    	[decoded.email]
+    	"SELECT ut.id, ut.used FROM user_tokens ut JOIN users u ON ut.user_id = u.id WHERE u.email = ? AND ut.type = 'verification' AND ut.token = ?",
+    	[decoded.email, token]
 	);
 
 	if (!records.length) throw new Error("Invalid token");
-	if (records[0].is_verified) throw new Error("Email already verified");
+	if (records[0].used) throw new Error("Email already verified");
 
-	await db.query(
-    	"UPDATE users SET is_verified = 1, verification_token = NULL WHERE email = ?",
-    	[decoded.email]
-	);
+	await db.query("UPDATE user_tokens SET used = 1 WHERE id = ?", [records[0].id]);
+	await db.query("UPDATE users SET is_verified = 1 WHERE email = ?", [decoded.email]);
 
 	return { status: "success", message: "Email verified! You can now log in." };
 };
@@ -98,9 +104,11 @@ export const resendVerification = async (email) => {
 		{ expiresIn: "5m"}
 	);
 
+	const expiry = new Date(Date.now() + 5 * 60 * 1000);
+
 	await db.query(
-		"UPDATE users SET verification_token = ? WHERE email = ?",
-		[verificationToken, email]
+		"INSERT INTO user_token (user_id, type, token, expires_at) VALUES (?, 'verification', ?, ?)",
+		[records[0].id, verificationToken, expiry]
   	);
 
 	const verificationLink = `${process.env.BASE_URL}/api/auth/verify-email?token=${verificationToken}`;
@@ -117,6 +125,13 @@ export const forgotPassword = async (email) => {
 
 	if (!records.length) return { status: "success", message: "A Reset Link has been sent." };
 
+	const userId = records[0].id;
+
+	await db.query(
+    "UPDATE user_tokens SET used = 1 WHERE user_id = ? AND type = 'reset'",
+    [userId]
+  );
+
 	const resetToken = jwt.sign(
 		{ email },
 		process.env.JWT_SECRET,
@@ -126,8 +141,8 @@ export const forgotPassword = async (email) => {
 	const expiry = new Date(Date.now() + 10 * 60 * 1000);
 
 	await db.query(
-		"UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?",
-		[resetToken, expiry, email]
+		"INSERT INTO user_tokens(user_id, type, token, expires_at) VALUES (?, 'reset', ?, ?)",
+		[userId, resetToken, expiry]
 	);
 
 	const resetLink = `${process.env.BASE_URL}/api/auth/reset-password?token=${resetToken}`;
@@ -141,23 +156,19 @@ export const resetPassword = async (token, newPassword) => {
 	const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
 	const [records] = await db.query(
-		"SELECT id, reset_token, reset_token_expiry FROM users WHERE email = ?",
-		[decoded.email]
+		"SELECT ut.id, ut.used, ut.expires_at FROM user_tokens ut JOIN users u ON ut.user_id = u.id WHERE u.email = ? and ut.type = 'reset' AND ut.token = ?",
+		[decoded.email, token]
 	);
 
 	if (!records.length) throw new Error("Invalid Token");
-
-	const user = records[0];
-
 	if (user.reset_token !== token) throw new Error("Invalid or already used token");
 	if (new Date() > new Date(user.reset_token_expiry)) throw new Error("Reset Link has expired.");
 
+	await db.query("UPDATE user_tokens set used = 1 WHERE id = ?", [records[0].id]);
+
 	const hashed = await bcrypt.hash(newPassword, 10);
-
-	console.log("Hashed password generated");
-
 	await db.query(
-		"UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?",
+		"UPDATE users SET password = ? WHERE email = ?",
 		[hashed, decoded.email]
 	);
 
@@ -165,7 +176,9 @@ export const resetPassword = async (token, newPassword) => {
 };
 
 export const getUserID = async (id) => {
-	const [records] = await db.query("SELECT `id`, `username`, `role` FROM `users` WHERE `id` = ?", [id]);
+	const [records] = await db.query(
+		"SELECT `id`, `username`, `role` FROM `users` WHERE `id` = ?",
+		[id]);
 
 	if(!records.length){
 		throw new Error("User not found");
