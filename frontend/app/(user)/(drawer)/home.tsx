@@ -1,5 +1,5 @@
 import { Text, TouchableOpacity, View, Image} from "react-native";
-import logo from "@/assets/images/Isda-iconS.png";
+import logo from "@/assets/images/icon.png";
 import { router } from "expo-router";
 import { useAuth } from "@/utils/authContext";
 
